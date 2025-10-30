@@ -63,7 +63,6 @@
   align-items: center;
   cursor: pointer;
   justify-content: center;
-  font-size: 1.5rem;
 }
 
 .noteActions {
@@ -78,4 +77,13 @@
   padding: 10px 20px;
   border-radius: 5px;
   color: #fff;
+}
+
+.noteButtonDelete {
+  background-color: #e74c3c;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
 }

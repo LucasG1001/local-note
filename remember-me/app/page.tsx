@@ -3,7 +3,7 @@ import Note from "./components/note/Note";
 export default function Home() {
   return (
     <div>
-      <Note />
+      <h1>Hello World</h1>
     </div>
   );
 }
