@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  tasks        Task[]
+}
+
+model Category {
+  id    Int      @id @default(autoincrement())
+  name  String   @unique
+  color String?
+  tasks Task[]
+}
+
+model Task {
+  id            String     @id @default(cuid())
+  userId        String?
+  title         String
+  description   String?
+  date          DateTime
+  reminderDate  DateTime?
+  status        String      @default("pendente")
+  isRecurring   Boolean     @default(false)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  user          User?       @relation(fields: [userId], references: [id])
+  categoryId    Int?
+  category      Category?   @relation(fields: [categoryId], references: [id])
+  reschedules   Reschedule[]
+}
+
+model Reschedule {
+  id        String   @id @default(cuid())
+  taskId    String
+  oldDate   DateTime
+  newDate   DateTime
+  reason    String?
+  createdAt DateTime @default(now())
+  task      Task     @relation(fields: [taskId], references: [id])
+}
