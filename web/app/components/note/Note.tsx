@@ -1,25 +1,26 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState } from "react";
-import Editor from "react-simple-code-editor";
-import Prism from "prismjs";
-import "prismjs/themes/prism-tomorrow.css";
-import "prismjs/components/prism-sql";
-import "prismjs/components/prism-javascript";
-import "prismjs/components/prism-python";
-import styles from "./Note.module.css";
+import React, { useEffect, useState } from 'react';
+import Editor from 'react-simple-code-editor';
+import Prism from 'prismjs';
+import 'prismjs/themes/prism-tomorrow.css';
+import 'prismjs/components/prism-sql';
+import 'prismjs/components/prism-javascript';
+import 'prismjs/components/prism-python';
+import styles from './Note.module.css';
 import {
   createNote,
   updateNote,
   deleteNote,
   incrementView,
-} from "../../actions/notes/notesActions";
+} from '../../actions/notes/notesActions';
 
 interface NoteProps {
   id: string;
   views: number;
   title: string;
   content: string;
+  language: string;
 }
 
 interface NoteComponentProps {
@@ -29,7 +30,7 @@ interface NoteComponentProps {
 export default function Note({ initialNotes }: NoteComponentProps) {
   const [notes, setNotes] = useState<NoteProps[]>(initialNotes);
   const [filtered, setFiltered] = useState<NoteProps[]>(initialNotes);
-  const [lang, setLang] = useState<string>("sql");
+  const [lang, setLang] = useState<string>('text');
   const [selectedNote, setSelectedNote] = useState<string | null>(null);
 
   useEffect(() => {
@@ -49,7 +50,9 @@ export default function Note({ initialNotes }: NoteComponentProps) {
     setSelectedNote(id);
     await incrementView(id);
     setNotes((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, views: n.views + 1 } : n))
+      prev
+        .map((n) => (n.id === id ? { ...n, views: n.views + 1 } : n))
+        .sort((a, b) => b.views - a.views),
     );
   };
 
@@ -69,9 +72,14 @@ export default function Note({ initialNotes }: NoteComponentProps) {
 
   const handleFilter = (title: string) => {
     const filteredNotes = notes.filter((n) =>
-      n.title.toLowerCase().includes(title.toLowerCase())
+      n.title.toLowerCase().includes(title.toLowerCase()),
     );
     setFiltered(filteredNotes);
+  };
+
+  const handleSetLanguage = (id: string, language: string) => {
+    setLang(language);
+    handleUpdate(id, { language });
   };
 
   return (
@@ -96,12 +104,15 @@ export default function Note({ initialNotes }: NoteComponentProps) {
               value={n.title}
               onChange={(e) => handleUpdate(n.id, { title: e.target.value })}
             />
-            <select onChange={(e) => setLang(e.target.value)} value={lang}>
-              <option value="sql">SQL</option>
-              <option value="javascript">JavaScript</option>
-              <option value="python">Python</option>
-              <option value="java">Java</option>
-              <option value="none">Texto</option>
+            <select
+              onChange={(e) => handleSetLanguage(n.id, e.target.value)}
+              value={n.language}
+            >
+              {Object.keys(Prism.languages).map((l) => (
+                <option key={l} value={l}>
+                  {l}
+                </option>
+              ))}
             </select>
             <button
               onClick={() => handleSelect(n.id)}
@@ -124,9 +135,13 @@ export default function Note({ initialNotes }: NoteComponentProps) {
               value={n.content}
               onValueChange={(code) => handleUpdate(n.id, { content: code })}
               highlight={(code) =>
-                lang === "none"
+                n.language === 'none'
                   ? code
-                  : Prism.highlight(code, Prism.languages[lang], lang)
+                  : Prism.highlight(
+                      code,
+                      Prism.languages[n.language],
+                      n.language,
+                    )
               }
               padding={20}
             />
