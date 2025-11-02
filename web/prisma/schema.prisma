@@ -7,6 +7,14 @@ datasource db {
   url      = "file:./dev.db"
 }
 
+model Folder {
+  id   String    @id @default(cuid())
+  name String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  notes Note[]
+}
+
 
 model Note {
   id        String    @id @default(cuid())
@@ -16,4 +24,7 @@ model Note {
   language  String
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+
+  folderId String
+  folder Folder @relation(fields: [folderId], references: [id])
 }

@@ -16,6 +16,7 @@ export async function createNote() {
       title: 'Nova nota',
       content: '',
       views: 0,
+      language: 'text',
     },
   });
   revalidatePath('/notes');
