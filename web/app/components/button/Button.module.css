@@ -1,0 +1,22 @@
+
+.delete {
+  color: red;
+  cursor: pointer;
+    height: 100%;
+  width: 100%;
+}
+
+.delete:hover {
+  background: red;
+  border-radius: 5px;
+
+}
+
+.collapse {
+  height: 100%;
+  width: 100%;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

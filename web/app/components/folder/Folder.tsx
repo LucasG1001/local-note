@@ -1,17 +1,40 @@
 'use client';
 import React from 'react';
-import { Prisma } from '@prisma/client';
 import styles from './Folder.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { byPrefixAndName } from '@fortawesome/fontawesome-svg-core/import.macro';
-import { createFolder } from '@/app/actions/folders/folderActions';
+import {
+  createFolder,
+  deleteFolder,
+  updateFolder,
+} from '@/app/actions/folders/folderActions';
+import { faTrashCan } from '@fortawesome/free-regular-svg-icons';
 
-type Props = {
-  folders: Prisma.Folder[];
-};
+interface Folder {
+  id: string;
+  name: string;
+}
 
-const Folder = ({ folders }: Props) => {
-  const [activeFolder, setActiveFolder] = React.useState<string | null>(null);
+interface FolderProps {
+  folders: Folder[];
+  folderId: string;
+  setFolderId: React.Dispatch<React.SetStateAction<string>>;
+}
+const Folder = ({ folders, folderId, setFolderId }: FolderProps) => {
+  React.useEffect(() => {
+    setFolderId(folders[0].id);
+  }, []);
+
+  const handleUpdate = async (id: string, data: Partial<Folder>) => {
+    clearTimeout((window as any)._updateTimer);
+    (window as any)._updateTimer = setTimeout(async () => {
+      await updateFolder(id, data);
+    }, 5000);
+  };
+
+  function handleSelect(folderId: string) {
+    setFolderId(folderId);
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -24,17 +47,21 @@ const Folder = ({ folders }: Props) => {
         <div
           key={folder.id}
           className={`${styles.folder} ${
-            activeFolder === folder.id && styles.active
+            folderId === folder.id && styles.active
           }`}
-          onClick={() => setActiveFolder(folder.id)}
+          onClick={() => handleSelect(folder.id)}
         >
           <input
             className={styles.folderText}
             type="text"
             value={folder.name}
+            onChange={(e) => handleUpdate(folder.id, { name: e.target.value })}
           />
-          <button>
-            <FontAwesomeIcon icon={byPrefixAndName.far['trash-can']} />
+          <button
+            onClick={() => deleteFolder(folder.id)}
+            className={styles.button}
+          >
+            <FontAwesomeIcon icon={faTrashCan} />
           </button>
         </div>
       ))}

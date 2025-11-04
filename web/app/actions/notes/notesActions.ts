@@ -10,13 +10,14 @@ export async function getNotes() {
   return notes;
 }
 
-export async function createNote() {
+export async function createNote(folderId: string) {
   const note = await prisma.note.create({
     data: {
       title: 'Nova nota',
       content: '',
       views: 0,
       language: 'text',
+      folderId: folderId,
     },
   });
   revalidatePath('/notes');

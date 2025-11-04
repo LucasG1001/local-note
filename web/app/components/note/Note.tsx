@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, ChangeEvent } from 'react';
 import Editor from 'react-simple-code-editor';
 import Prism from 'prismjs';
 import 'prismjs/themes/prism-tomorrow.css';
 import 'prismjs/components/prism-sql';
 import 'prismjs/components/prism-javascript';
 import 'prismjs/components/prism-python';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import styles from './Note.module.css';
 import {
   createNote,
@@ -14,140 +15,172 @@ import {
   deleteNote,
   incrementView,
 } from '../../actions/notes/notesActions';
+import Folder from '../folder/Folder';
+import {
+  faArrowDown,
+  faArrowUp,
+  faTrash,
+} from '@fortawesome/free-solid-svg-icons';
+import Button from '../button/Button';
 
-interface NoteProps {
+interface Note {
   id: string;
   views: number;
   title: string;
   content: string;
   language: string;
+  folderId: string;
 }
 
-interface NoteComponentProps {
-  initialNotes: NoteProps[];
+interface NoteProps {
+  initialNotes: Note[];
+  folders: Folder[];
 }
 
-export default function Note({ initialNotes }: NoteComponentProps) {
-  const [notes, setNotes] = useState<NoteProps[]>(initialNotes);
-  const [filtered, setFiltered] = useState<NoteProps[]>(initialNotes);
-  const [lang, setLang] = useState<string>('text');
-  const [selectedNote, setSelectedNote] = useState<string | null>(null);
+export default function Note({ initialNotes = [], folders }: NoteProps) {
+  const [notes, setNotes] = useState<Note[]>(initialNotes);
+  const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
+  const [activeLanguage, setActiveLanguage] = useState<string>('text');
+  const [folderId, setFolderId] = useState<string>('');
+  const updateTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  useEffect(() => {
-    setFiltered(notes);
-  }, [notes]);
+  const filteredNotes = React.useMemo(() => {
+    if (!folderId) return notes;
+    return notes.filter((note) => note.folderId === folderId);
+  }, [notes, folderId]);
 
   const handleCreate = async () => {
-    const newNote = await createNote();
-    setNotes((prev) => [newNote, ...prev]);
+    const newNote = await createNote(folderId);
+    setNotes((prevNotes) => [newNote, ...prevNotes]);
   };
 
-  const handleSelect = async (id: string) => {
-    if (selectedNote === id) {
-      setSelectedNote(null);
-      return;
+  const handleSelectNote = async (id: string) => {
+    const isAlreadySelected = selectedNoteId === id;
+    setSelectedNoteId(isAlreadySelected ? null : id);
+
+    if (!isAlreadySelected) {
+      await incrementView(id);
+      setNotes((prevNotes) =>
+        prevNotes
+          .map((note) =>
+            note.id === id ? { ...note, views: note.views + 1 } : note,
+          )
+          .sort((a, b) => b.views - a.views),
+      );
     }
-    setSelectedNote(id);
-    await incrementView(id);
-    setNotes((prev) =>
-      prev
-        .map((n) => (n.id === id ? { ...n, views: n.views + 1 } : n))
-        .sort((a, b) => b.views - a.views),
-    );
   };
 
   const handleDelete = async (id: string) => {
     await deleteNote(id);
-    setNotes((prev) => prev.filter((n) => n.id !== id));
+    setNotes((prevNotes) => prevNotes.filter((note) => note.id !== id));
   };
 
-  const handleUpdate = async (id: string, data: Partial<NoteProps>) => {
-    setNotes((prev) => prev.map((n) => (n.id === id ? { ...n, ...data } : n)));
-    // debounce local de 5s antes de salvar no backend
-    clearTimeout((window as any)._updateTimer);
-    (window as any)._updateTimer = setTimeout(async () => {
-      await updateNote(id, data);
+  const handleUpdate = (id: string, updatedFields: Partial<Note>) => {
+    setNotes((prevNotes) =>
+      prevNotes.map((note) =>
+        note.id === id ? { ...note, ...updatedFields } : note,
+      ),
+    );
+
+    if (updateTimerRef.current) clearTimeout(updateTimerRef.current);
+
+    updateTimerRef.current = setTimeout(async () => {
+      await updateNote(id, updatedFields);
     }, 5000);
   };
 
-  const handleFilter = (title: string) => {
-    const filteredNotes = notes.filter((n) =>
-      n.title.toLowerCase().includes(title.toLowerCase()),
-    );
-    setFiltered(filteredNotes);
+  const handleFilter = (event: ChangeEvent<HTMLInputElement>) => {
+    const query = event.target.value.toLowerCase();
+    // setFilteredNotes(
+    //   notes.filter(
+    //     (note) =>
+    //       note.title.toLowerCase().includes(query) &&
+    //       note.folderId === folderId,
+    //   ),
+    // );
   };
 
-  const handleSetLanguage = (id: string, language: string) => {
-    setLang(language);
+  const handleLanguageChange = (id: string, language: string) => {
+    setActiveLanguage(language);
     handleUpdate(id, { language });
   };
 
+  const renderLanguageOptions = () =>
+    Object.keys(Prism.languages).map((langKey) => (
+      <option key={langKey} value={langKey}>
+        {langKey}
+      </option>
+    ));
+
   return (
     <div className={styles.note}>
-      <div className={styles.noteActions}>
-        <button className={styles.noteButton} onClick={handleCreate}>
-          Nova
-        </button>
-        <input
-          className={styles.noteFilter}
-          type="text"
-          placeholder="Filtrar por título"
-          onChange={(e) => handleFilter(e.target.value)}
-        />
-      </div>
-
-      {filtered.map((n) => (
-        <div key={n.id} className={styles.noteItem}>
-          <div className={styles.noteHeader}>
-            <input
-              type="text"
-              value={n.title}
-              onChange={(e) => handleUpdate(n.id, { title: e.target.value })}
-            />
-            <select
-              onChange={(e) => handleSetLanguage(n.id, e.target.value)}
-              value={n.language}
-            >
-              {Object.keys(Prism.languages).map((l) => (
-                <option key={l} value={l}>
-                  {l}
-                </option>
-              ))}
-            </select>
-            <button
-              onClick={() => handleSelect(n.id)}
-              className={styles.noteButtonSelect}
-            >
-              ^
-            </button>
-
-            <button
-              className={styles.noteButtonDelete}
-              onClick={() => handleDelete(n.id)}
-            >
-              Delete
-            </button>
-          </div>
-
-          {selectedNote === n.id && (
-            <Editor
-              className={styles.textarea}
-              value={n.content}
-              onValueChange={(code) => handleUpdate(n.id, { content: code })}
-              highlight={(code) =>
-                n.language === 'none'
-                  ? code
-                  : Prism.highlight(
-                      code,
-                      Prism.languages[n.language],
-                      n.language,
-                    )
-              }
-              padding={20}
-            />
-          )}
+      <Folder folders={folders} folderId={folderId} setFolderId={setFolderId} />
+      <div>
+        <div className={styles.noteActions}>
+          <button className={styles.noteButton} onClick={handleCreate}>
+            +
+          </button>
+          <input
+            className={styles.noteFilter}
+            type="text"
+            placeholder="Filtrar por título"
+            onChange={handleFilter}
+          />
         </div>
-      ))}
+
+        {filteredNotes.map((note) => {
+          const isSelected = selectedNoteId === note.id;
+
+          return (
+            <div key={note.id} className={styles.noteItem}>
+              <div className={styles.noteHeader}>
+                <input
+                  type="text"
+                  value={note.title}
+                  onChange={(e) =>
+                    handleUpdate(note.id, { title: e.target.value })
+                  }
+                />
+
+                {isSelected ? (
+                  <Button text="" variant="collapse" icon={faArrowUp} />
+                ) : (
+                  <Button text="" variant="collapse" icon={faArrowDown} />
+                )}
+                <Button
+                  text="Excluir"
+                  variant="delete"
+                  onClick={() => handleDelete(note.id)}
+                  icon={faTrash}
+                />
+              </div>
+
+              {isSelected && (
+                <div className={styles.noteContent}>
+                  <Editor
+                    className={styles.textarea}
+                    id={note.id}
+                    value={note.content}
+                    onValueChange={(code) =>
+                      handleUpdate(note.id, { content: code })
+                    }
+                    highlight={(code) =>
+                      note.language === 'none'
+                        ? code
+                        : Prism.highlight(
+                            code,
+                            Prism.languages[note.language],
+                            note.language,
+                          )
+                    }
+                    padding={20}
+                  />
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
