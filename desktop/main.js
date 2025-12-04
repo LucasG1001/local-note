@@ -1,10 +1,6 @@
 import { app, BrowserWindow } from "electron";
 import path from "path";
 import fs from "fs";
-import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const isDev = !app.isPackaged;
 
@@ -18,32 +14,17 @@ function createWindow() {
     },
   });
 
-  const indexPath = path.join(__dirname, "dist", "index.html");
-
-  // Logar o caminho gerado
-  console.log("Index path:", indexPath);
-
-  // Verificar se existe
-  console.log("Arquivo existe?", fs.existsSync(indexPath));
-
-  if (!fs.existsSync(indexPath)) {
-    console.error("ERRO: index.html não encontrado no caminho esperado!");
-  }
+  let indexPath;
 
   if (isDev) {
-    win.loadURL("http://localhost:5173");
+    indexPath = "http://localhost:5173";
+    win.loadURL(indexPath);
   } else {
-    const indexPath = path.join(__dirname, "dist", "index.html");
+    // Caminho correto para build empacotado
+    indexPath = path.join(app.getAppPath(), "dist", "index.html");
 
-    // Logar o caminho gerado
     console.log("Index path:", indexPath);
-
-    // Verificar se existe
-    console.log("Arquivo existe?", fs.existsSync(indexPath));
-
-    if (!fs.existsSync(indexPath)) {
-      console.error("ERRO: index.html não encontrado no caminho esperado!");
-    }
+    console.log("Existe?", fs.existsSync(indexPath));
 
     win.loadFile(indexPath);
   }
