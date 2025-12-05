@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import Prism from "prismjs";
 import Menu from "./Menu/Menu";
 import styles from "./Note.module.css";
@@ -11,15 +11,53 @@ import "prismjs/themes/prism-tomorrow.css";
 
 const Note = () => {
   const [sections, setSections] = React.useState([
-    { id: 1, text: "Olá", mode: "normal", isSelected: true, type: "text" },
-    { id: 2, text: "Teste", mode: "normal", isSelected: false, type: "text" },
-    { id: 3, text: "123", mode: "normal", isSelected: false, type: "text" },
+    {
+      id: 1,
+      title: "Introdução",
+      text: "Bem-vindo ao documento! Aqui você encontrará uma visão geral do conteúdo.",
+      mode: "normal",
+      type: "text",
+    },
+    {
+      id: 2,
+      title: "Resumo",
+      text: "Este é um pequeno resumo das principais ideias apresentadas na seção anterior.",
+      mode: "edit",
+      type: "text",
+    },
+    {
+      id: 3,
+      title: "Lista de Tarefas",
+      text: "- Comprar itens\n- Revisar o código\n- Preparar apresentação",
+      mode: "normal",
+      type: "list",
+    },
+    {
+      id: 4,
+      title: "Código Exemplo",
+      text: "function soma(a, b) {\n  return a + b;\n}",
+      mode: "normal",
+      type: "code",
+    },
+    {
+      id: 5,
+      title: "Notas Finais",
+      text: "Lembre-se de validar os dados antes de enviar e revisar o layout.",
+      mode: "normal",
+      type: "text",
+    },
   ]);
+
+  const editorRefs = useRef({});
+
+  useEffect(() => {
+    focusEditor(sections[sections.length - 1].id);
+  }, [sections]);
 
   const handleChange = ({ value, id }: { value: string; id: number }) => {
     let currentMode = sections.find((item) => item.id === Number(id))?.mode;
-    console.log(value, id);
 
+    if (!currentMode) return;
     if (value.includes("'''")) {
       value = value.replace("'''", "");
       if (currentMode === "codeMode") currentMode = "normal";
@@ -28,7 +66,11 @@ const Note = () => {
 
     const newSections = sections.map((item) => {
       if (item.id === Number(id)) {
-        return { ...item, text: value, mode: currentMode };
+        return {
+          ...item,
+          text: value,
+          mode: currentMode,
+        };
       }
       return item;
     });
@@ -40,12 +82,14 @@ const Note = () => {
     if (e.key === "Delete") {
       handleDelete(sections[index].id);
     } else if (e.key === "Enter" && e.shiftKey) {
+      e.preventDefault();
       const newSections = [...sections];
+
       newSections.splice(index + 1, 0, {
         id: sections.length + 1,
+        title: "Novo item",
         text: "",
         mode: "normal",
-        isSelected: false,
         type: "text",
       });
       setSections(newSections);
@@ -64,7 +108,15 @@ const Note = () => {
     if (/def |import |print\(|:\s*$/i.test(trimmed)) return "python";
     if (/const |let |function |=>/i.test(trimmed)) return "javascript";
 
-    return "normal"; // <- nenhum match → texto normal
+    return "normal";
+  }
+
+  function focusEditor(id: number) {
+    const wrapper = editorRefs.current[id];
+    if (!wrapper) return;
+
+    const textarea = wrapper.querySelector("textarea");
+    if (textarea) textarea.focus();
   }
 
   return (
@@ -72,7 +124,13 @@ const Note = () => {
       <Menu />
       <div className={styles.content}>
         {sections.map((item, index) => (
-          <React.Fragment key={index}>
+          <div
+            key={item.id}
+            ref={(el) => {
+              if (el) editorRefs.current[item.id] = el;
+            }}
+            className="editor-wrapper"
+          >
             <Editor
               value={item.text}
               onValueChange={(code) =>
@@ -88,7 +146,7 @@ const Note = () => {
               onKeyDown={(e) => handleKeyDown(e, index)}
             />
             <Line />
-          </React.Fragment>
+          </div>
         ))}
       </div>
     </div>
