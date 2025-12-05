@@ -1,0 +1,35 @@
+.container {
+  background: red;
+  width: 100vw;
+  height: 100vh;
+  display: grid;
+  grid-template-columns: 350px 1fr;
+}
+
+.content {
+  width: 100%;
+  background: #212121;
+
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.textarea {
+  background: #212121;
+  outline: none;
+  border: none;
+  color: #fff;
+  padding: 10px 20px;
+  font-size: 16px;
+  overflow: hidden; /* impede scroll */
+  resize: none; /* opcional */
+  margin: 10px 0px;
+}
+
+.codeMode {
+  background: #1e1e1e;
+  font-family: "Fira Code", monospace;
+  color: #00ff95;
+  border-radius: 10px;
+}

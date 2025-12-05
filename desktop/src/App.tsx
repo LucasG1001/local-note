@@ -1,11 +1,9 @@
 import "./App.css";
+import Menu from "./note/Menu/Menu";
+import Note from "./note/Note";
 
 function App() {
-  return (
-    <>
-      <h1>Hello</h1>
-    </>
-  );
+  return <Note />;
 }
 
 export default App;
