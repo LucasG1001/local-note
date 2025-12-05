@@ -15,21 +15,55 @@
   padding: 20px;
 }
 
-.textarea {
+/* Estilo geral do editor */
+.codeEditor {
   background: #212121;
-  outline: none;
-  border: none;
   color: #fff;
-  padding: 10px 20px;
+  font-family: monospace;
   font-size: 16px;
-  overflow: hidden; /* impede scroll */
-  resize: none; /* opcional */
-  margin: 10px 0px;
+  border-radius: 6px;
+  padding: 10px 20px;
+  margin: 10px 0;
+  min-height: 60px;
+
+  /* Remove qualquer outline externo */
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+
+  /* Evita quebra brusca */
+  white-space: pre-wrap;
 }
 
-.codeMode {
-  background: #1e1e1e;
-  font-family: "Fira Code", monospace;
-  color: #00ff95;
-  border-radius: 10px;
+/* Remove qualquer estilo do textarea invisível dentro do editor */
+.codeEditor textarea,
+.codeEditor textarea:focus {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  color: transparent !important; /* textarea é só para input */
+  caret-color: #fff; /* cursor branco visível */
+}
+
+/* Remove outlines de qualquer elemento interno */
+.codeEditor *,
+.codeEditor *:focus {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Evita scroll inesperado */
+.codeEditor code,
+.codeEditor pre {
+  overflow: hidden !important;
+}
+
+.codeEditor .token.operator {
+  background: transparent !important;
+}
+/* Remove qualquer fundo aplicado pelo Prism */
+.codeEditor pre[class*="language-"] .token {
+  background: transparent !important;
 }
