@@ -1,7 +1,7 @@
-'use server';
-import { getFolders } from '../actions/folders/folderActions';
-import { getNotes } from '../actions/notes/notesActions';
-import Note from '../components/note/Note';
+"use server";
+import { getFolders } from "../actions/folders/folderActions";
+import { getNotes } from "../actions/notes/notesActions";
+import Note from "./components/note/Note";
 export default async function NotesPage() {
   const notes = await getNotes();
   const folders = await getFolders();

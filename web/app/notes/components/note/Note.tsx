@@ -1,27 +1,20 @@
-'use client';
+"use client";
 
-import React, { useEffect, useState, useRef, ChangeEvent } from 'react';
-import Editor from 'react-simple-code-editor';
-import Prism from 'prismjs';
-import 'prismjs/themes/prism-tomorrow.css';
-import 'prismjs/components/prism-sql';
-import 'prismjs/components/prism-javascript';
-import 'prismjs/components/prism-python';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import styles from './Note.module.css';
-import {
-  createNote,
-  updateNote,
-  deleteNote,
-  incrementView,
-} from '../../actions/notes/notesActions';
-import Folder from '../folder/Folder';
+import Prism from "prismjs";
+import "prismjs/components/prism-javascript";
+import "prismjs/components/prism-python";
+import "prismjs/components/prism-sql";
+import "prismjs/themes/prism-tomorrow.css";
+import React, { ChangeEvent, useRef, useState } from "react";
+import Editor from "react-simple-code-editor";
+import styles from "./Note.module.css";
+
+import Button from "@/app/components/button/Button";
 import {
   faArrowDown,
   faArrowUp,
   faTrash,
-} from '@fortawesome/free-solid-svg-icons';
-import Button from '../button/Button';
+} from "@fortawesome/free-solid-svg-icons";
 
 interface Note {
   id: string;
@@ -34,14 +27,13 @@ interface Note {
 
 interface NoteProps {
   initialNotes: Note[];
-  folders: Folder[];
 }
 
-export default function Note({ initialNotes = [], folders }: NoteProps) {
+export default function Note({ initialNotes = [] }: NoteProps) {
   const [notes, setNotes] = useState<Note[]>(initialNotes);
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
-  const [activeLanguage, setActiveLanguage] = useState<string>('text');
-  const [folderId, setFolderId] = useState<string>('');
+  const [activeLanguage, setActiveLanguage] = useState<string>("text");
+  const [folderId, setFolderId] = useState<string>("");
   const updateTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const filteredNotes = React.useMemo(() => {
@@ -63,9 +55,9 @@ export default function Note({ initialNotes = [], folders }: NoteProps) {
       setNotes((prevNotes) =>
         prevNotes
           .map((note) =>
-            note.id === id ? { ...note, views: note.views + 1 } : note,
+            note.id === id ? { ...note, views: note.views + 1 } : note
           )
-          .sort((a, b) => b.views - a.views),
+          .sort((a, b) => b.views - a.views)
       );
     }
   };
@@ -78,8 +70,8 @@ export default function Note({ initialNotes = [], folders }: NoteProps) {
   const handleUpdate = (id: string, updatedFields: Partial<Note>) => {
     setNotes((prevNotes) =>
       prevNotes.map((note) =>
-        note.id === id ? { ...note, ...updatedFields } : note,
-      ),
+        note.id === id ? { ...note, ...updatedFields } : note
+      )
     );
 
     if (updateTimerRef.current) clearTimeout(updateTimerRef.current);
@@ -91,13 +83,6 @@ export default function Note({ initialNotes = [], folders }: NoteProps) {
 
   const handleFilter = (event: ChangeEvent<HTMLInputElement>) => {
     const query = event.target.value.toLowerCase();
-    // setFilteredNotes(
-    //   notes.filter(
-    //     (note) =>
-    //       note.title.toLowerCase().includes(query) &&
-    //       note.folderId === folderId,
-    //   ),
-    // );
   };
 
   const handleLanguageChange = (id: string, language: string) => {
@@ -114,7 +99,6 @@ export default function Note({ initialNotes = [], folders }: NoteProps) {
 
   return (
     <div className={styles.note}>
-      <Folder folders={folders} folderId={folderId} setFolderId={setFolderId} />
       <div>
         <div className={styles.noteActions}>
           <button className={styles.noteButton} onClick={handleCreate}>
@@ -165,12 +149,12 @@ export default function Note({ initialNotes = [], folders }: NoteProps) {
                       handleUpdate(note.id, { content: code })
                     }
                     highlight={(code) =>
-                      note.language === 'none'
+                      note.language === "none"
                         ? code
                         : Prism.highlight(
                             code,
                             Prism.languages[note.language],
-                            note.language,
+                            note.language
                           )
                     }
                     padding={20}
