@@ -16,53 +16,45 @@ const Note = () => {
       id: 1,
       title: "Introdução",
       text: "Bem-vindo ao documento! Aqui você encontrará uma visão geral do conteúdo.",
-      mode: "normal",
       type: "text",
     },
     {
       id: 2,
       title: "Resumo",
       text: "Este é um pequeno resumo das principais ideias apresentadas na seção anterior.",
-      mode: "edit",
       type: "text",
     },
     {
       id: 3,
       title: "Lista de Tarefas",
       text: "- Comprar itens\n- Revisar o código\n- Preparar apresentação",
-      mode: "normal",
-      type: "list",
+      type: "text",
     },
     {
       id: 4,
       title: "Código Exemplo",
       text: "function soma(a, b) {\n  return a + b;\n}",
-      mode: "normal",
       type: "code",
     },
     {
       id: 5,
       title: "Notas Finais",
       text: "Lembre-se de validar os dados antes de enviar e revisar o layout.",
-      mode: "normal",
       type: "text",
     },
   ]);
 
   const editorRefs = useRef({});
 
-  useEffect(() => {
-    focusEditor(sections[sections.length - 1].id);
-  }, [sections]);
-
   const handleChange = ({ value, id }: { value: string; id: number }) => {
-    let currentMode = sections.find((item) => item.id === Number(id))?.mode;
+    let currentMode = sections.find((item) => item.id === Number(id))?.type;
 
+    console.log(currentMode);
     if (!currentMode) return;
     if (value.includes("'''")) {
       value = value.replace("'''", "");
-      if (currentMode === "codeMode") currentMode = "normal";
-      else currentMode = "codeMode";
+      if (currentMode === "code") currentMode = "text";
+      else currentMode = "code";
     }
 
     const newSections = sections.map((item) => {
@@ -70,7 +62,7 @@ const Note = () => {
         return {
           ...item,
           text: value,
-          mode: currentMode,
+          type: currentMode,
         };
       }
       return item;
@@ -84,13 +76,13 @@ const Note = () => {
       handleDelete(sections[index].id);
     } else if (e.key === "Enter" && e.shiftKey) {
       e.preventDefault();
+      focusEditor(sections[sections.length - 1].id);
       const newSections = [...sections];
 
       newSections.splice(index + 1, 0, {
         id: sections.length + 1,
         title: "Novo item",
         text: "",
-        mode: "normal",
         type: "text",
       });
       setSections(newSections);
@@ -138,15 +130,15 @@ const Note = () => {
                 handleChange({ value: code, id: item.id })
               }
               highlight={(code) => {
+                if (item.type === "text") return code;
                 const lang = detectLanguage(code);
                 if (lang === "normal") return code;
                 return Prism.highlight(code, Prism.languages[lang], lang);
               }}
               padding={10}
-              className={styles.codeEditor}
+              className={`${styles.editor} ${styles[item.type]}`}
               onKeyDown={(e) => handleKeyDown(e, index)}
             />
-            <Line />
           </div>
         ))}
       </div>
