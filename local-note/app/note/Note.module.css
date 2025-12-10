@@ -43,7 +43,6 @@
   caret-color: #fff;
 }
 
-/* Remove outlines de qualquer elemento interno */
 .editor *,
 .editor *:focus {
   outline: none !important;
