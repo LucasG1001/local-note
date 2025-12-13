@@ -4,53 +4,56 @@ import "prismjs/components/prism-javascript"; // ou a linguagem que quiser
 import "prismjs/components/prism-python";
 import "prismjs/components/prism-sql";
 import "prismjs/themes/prism-tomorrow.css";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect } from "react";
 import Editor from "react-simple-code-editor";
-import Line from "../components/line/Line";
 import Menu from "./Menu/Menu";
 import styles from "./Note.module.css";
+
+type Note = {
+  id: string;
+  title: string;
+  tags: string[];
+  sections: NoteSection[];
+};
+
+type NoteSection = {
+  id: string;
+  title: string;
+  text: string;
+  type: "text" | "code";
+};
 
 const Note = () => {
   const [sections, setSections] = React.useState([
     {
-      id: 1,
-      title: "Introdução",
-      text: "Bem-vindo ao documento! Aqui você encontrará uma visão geral do conteúdo.",
-      type: "text",
-    },
-    {
-      id: 2,
-      title: "Resumo",
-      text: "Este é um pequeno resumo das principais ideias apresentadas na seção anterior.",
-      type: "text",
-    },
-    {
-      id: 3,
-      title: "Lista de Tarefas",
-      text: "- Comprar itens\n- Revisar o código\n- Preparar apresentação",
-      type: "text",
-    },
-    {
-      id: 4,
-      title: "Código Exemplo",
-      text: "function soma(a, b) {\n  return a + b;\n}",
-      type: "code",
-    },
-    {
-      id: 5,
-      title: "Notas Finais",
-      text: "Lembre-se de validar os dados antes de enviar e revisar o layout.",
-      type: "text",
+      id: "fgtr5h4rt65h4rt65h",
+      title: "",
+      text: "",
+      type: "",
     },
   ]);
+  const [currentSectionId, setCurrentSectionId] = React.useState(
+    sections[sections.length - 1].id
+  );
 
-  const editorRefs = useRef({});
+  useEffect(() => {
+    if (sections.length > 0) {
+      const lastIndex = sections.length - 1;
+      console.log(sections[lastIndex].id, currentSectionId);
 
-  const handleChange = ({ value, id }: { value: string; id: number }) => {
-    let currentMode = sections.find((item) => item.id === Number(id))?.type;
+      if (sections[lastIndex].id === currentSectionId) return;
+      setCurrentSectionId(sections[lastIndex].id);
+      const lastSection = document.getElementById(`${sections[lastIndex].id}`);
+      if (lastSection) {
+        const textarea = lastSection.querySelector("textarea");
+        textarea?.focus();
+      }
+    }
+  }, [sections, currentSectionId]);
 
-    console.log(currentMode);
-    if (!currentMode) return;
+  const handleChange = ({ value, id }: { value: string; id: string }) => {
+    let currentMode = sections.find((item) => item.id === id)?.type;
+
     if (value.includes("'''")) {
       value = value.replace("'''", "");
       if (currentMode === "code") currentMode = "text";
@@ -58,7 +61,7 @@ const Note = () => {
     }
 
     const newSections = sections.map((item) => {
-      if (item.id === Number(id)) {
+      if (item.id === id) {
         return {
           ...item,
           text: value,
@@ -73,23 +76,24 @@ const Note = () => {
 
   const handleKeyDown = (e: any, index: number) => {
     if (e.key === "Delete") {
+      e.preventDefault();
+
       handleDelete(sections[index].id);
     } else if (e.key === "Enter" && e.shiftKey) {
       e.preventDefault();
-      focusEditor(sections[sections.length - 1].id);
       const newSections = [...sections];
 
-      newSections.splice(index + 1, 0, {
-        id: sections.length + 1,
+      const newItem = {
+        id: crypto.randomUUID(),
         title: "Novo item",
         text: "",
         type: "text",
-      });
-      setSections(newSections);
+      };
+      setSections((prev) => [...prev, newItem]);
     }
   };
 
-  const handleDelete = (id: number) => {
+  const handleDelete = (id: string) => {
     const newSections = sections.filter((item) => item.id !== id);
     setSections(newSections);
   };
@@ -104,26 +108,12 @@ const Note = () => {
     return "normal";
   }
 
-  function focusEditor(id: number) {
-    const wrapper = editorRefs.current[id];
-    if (!wrapper) return;
-
-    const textarea = wrapper.querySelector("textarea");
-    if (textarea) textarea.focus();
-  }
-
   return (
     <div className={styles.container}>
       <Menu />
       <div className={styles.content}>
         {sections.map((item, index) => (
-          <div
-            key={item.id}
-            ref={(el) => {
-              if (el) editorRefs.current[item.id] = el;
-            }}
-            className="editor-wrapper"
-          >
+          <div key={item.id} className="editor-wrapper" id={`${item.id}`}>
             <Editor
               value={item.text}
               onValueChange={(code) =>

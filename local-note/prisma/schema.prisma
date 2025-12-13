@@ -1,0 +1,37 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Note {
+  id        String        @id @default(uuid())
+  title     String
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  
+  // Relacionamentos
+  tags      Tag[]
+  sections  NoteSection[]
+}
+
+model Tag {
+  id     String @id @default(uuid())
+  name   String
+  noteId String
+  note   Note   @relation(fields: [noteId], references: [id], onDelete: Cascade)
+}
+
+model NoteSection {
+  id      String @id @default(uuid())
+  title   String
+  text    String
+  type    String // Vamos tratar "text" | "code" no nível da aplicação
+  noteId  String
+  note    Note   @relation(fields: [noteId], references: [id], onDelete: Cascade)
+}

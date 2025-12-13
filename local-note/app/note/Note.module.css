@@ -1,5 +1,4 @@
 .container {
-  background: red;
   width: 100vw;
   height: 100vh;
   display: grid;
@@ -13,6 +12,7 @@
   display: flex;
   flex-direction: column;
   padding: 20px;
+  overflow-y: scroll;
 }
 
 .editor {
