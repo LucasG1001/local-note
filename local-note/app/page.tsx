@@ -1,9 +1,12 @@
+import { getNotes, NoteResponseDTO } from "./actions/NoteActions";
 import Note from "./note/Note";
 
-export default function Home() {
+export default async function Home() {
+  const notes: NoteResponseDTO[] = await getNotes();
+
   return (
     <div>
-      <Note />
+      <Note initialNotes={notes} />
     </div>
   );
 }
