@@ -1,13 +1,6 @@
 import React from 'react';
-import { X, Copy, Check, Terminal, Tag } from 'lucide-react';
-
-interface InfoCard {
-  id: number;
-  titulo: string;
-  tags: string[];
-  content: string;
-  categoria: 'code' | 'contact' | 'event' | 'general';
-}
+import { Tag } from 'lucide-react';
+import { InfoCard } from '../types/note';
 
 interface TagsProps {
   item: InfoCard | null;

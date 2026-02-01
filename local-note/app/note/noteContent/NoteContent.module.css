@@ -1,0 +1,14 @@
+.noteInput {
+  font-size: 1rem;
+  line-height: 1.25rem;
+  margin-bottom: 1rem;
+  font-family: Roboto;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  border: none;
+  color: inherit;
+  width: 100%;
+  resize: none;
+  overflow: hidden;
+  font-weight: 600;
+}
