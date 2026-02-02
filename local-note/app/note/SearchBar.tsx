@@ -1,26 +1,62 @@
-import { Search } from 'lucide-react';
-import React from 'react';
+// Dentro do seu SearchBar.tsx (resumo da lógica)
+import React, { useState, useEffect } from 'react';
+import styles from './SearchBar.module.css';
 
 interface SearchBarProps {
   searchTerm: string;
-  setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
+  setSearchTerm: (val: string) => void;
+  suggestions: string[];
 }
 
-const SearchBar = ({ searchTerm, setSearchTerm }: SearchBarProps) => {
+export default function SearchBar({
+  searchTerm,
+  setSearchTerm,
+  suggestions,
+}: SearchBarProps) {
+  const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
+  // Pega a última palavra digitada
+  const words = searchTerm.split(' ');
+  const lastWord = words[words.length - 1].toLowerCase();
+
+  // Filtra as sugestões com base na última palavra
+  const filteredSuggestions = suggestions.filter(
+    (tag) => tag.toLowerCase().startsWith(lastWord) && lastWord.length > 1,
+  );
+
+  const handleSelectSuggestion = (tag: string) => {
+    const newWords = [...words];
+    newWords[newWords.length - 1] = tag; // Substitui a palavra incompleta pela tag
+    setSearchTerm(newWords.join(' ') + ' '); // Adiciona um espaço após a tag
+    setShowSuggestions(false);
+  };
+
   return (
-    <div className="max-w-2xl mx-auto mb-10 sticky top-0 z-10 bg-[#131314] pb-4">
-      <div className="relative">
-        <Search className="absolute left-4 top-3.5 text-gray-500" size={20} />
-        <input
-          type="text"
-          placeholder="Pesquise por tags (ex: sql procedure)..."
-          className="w-full bg-[#1e1e1f] border border-[#333] rounded-xl py-3 pl-12 pr-4 focus:outline-none focus:border-blue-500 transition-all shadow-2xl"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-      </div>
+    <div className={styles.searchWrapper}>
+      <input
+        type="text"
+        value={searchTerm}
+        onChange={(e) => {
+          setSearchTerm(e.target.value);
+          setShowSuggestions(true);
+        }}
+        placeholder="Busque por título ou tags..."
+      />
+
+      {showSuggestions && filteredSuggestions.length > 0 && (
+        <ul className={styles.suggestionList}>
+          {filteredSuggestions.map((tag, index) => (
+            <li
+              key={tag}
+              onClick={() => handleSelectSuggestion(tag)}
+              className={styles.suggestionItem}
+            >
+              {tag}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
-};
-
-export default SearchBar;
+}

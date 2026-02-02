@@ -38,9 +38,9 @@ const NoteContent = () => {
 
   return (
     <div className={styles.container}>
-      <span className={styles.saveStatus}>
+      {/* <span className={styles.saveStatus}>
         {isPending ? 'Alterações pendentes' : 'Salvo'}
-      </span>
+      </span> */}
 
       <textarea
         ref={textareaRef}

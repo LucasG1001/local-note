@@ -1,0 +1,63 @@
+.searchWrapper {
+  position: relative;
+  max-width: 56rem;
+  margin: 0 auto 2rem auto;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  background-color: #1E1F20;
+  border: 1px solid #333;
+  border-radius: 12px;
+  color: #ffffff;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.searchInput:focus {
+  border-color: #4b5563; /* Um cinza levemente mais claro */
+}
+
+/* Lista de Sugestões */
+.suggestionList {
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 0;
+  right: 0;
+  background-color: #1E1F20;
+  border: 1px solid #333;
+  border-radius: 10px;
+  list-style: none;
+  padding: 8px 0;
+  margin: 0;
+  z-index: 100;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+}
+
+.suggestionItem {
+  padding: 10px 20px;
+  cursor: pointer;
+  color: #e3e3e3;
+  font-size: 0.9rem;
+  transition: background-color 0.15s;
+}
+
+/* Item focado via teclado ou mouse */
+.suggestionItemActive, .suggestionItem:hover {
+  background-color: #2a2b2d;
+  color: #ffffff;
+}
+
+/* Mensagem de Aviso (No NoteManager) */
+.warning {
+  max-width: 56rem;
+  margin: 0 auto 1rem auto;
+  padding: 10px;
+  background-color: rgba(245, 158, 11, 0.1); /* Laranja sutil */
+  border-left: 4px solid #f59e0b;
+  color: #f59e0b;
+  font-size: 0.875rem;
+  border-radius: 4px;
+}
