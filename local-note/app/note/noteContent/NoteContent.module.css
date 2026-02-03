@@ -1,7 +1,6 @@
 .noteInput {
   line-height: 1.25rem;
   margin-bottom: 1rem;
-  font-family: Roboto;
   padding: 0.5rem;
   border-radius: 0.25rem;
   border: none;
@@ -15,8 +14,5 @@
   color: #e3e3e3;
   font-weight: 400;
 
-
 }
 
-.saveStatus {
-}

@@ -35,6 +35,9 @@ export default function SearchBar({
   return (
     <div className={styles.searchWrapper}>
       <input
+        className={styles.searchInput}
+        spellCheck="false"
+        autoComplete="off"
         type="text"
         value={searchTerm}
         onChange={(e) => {

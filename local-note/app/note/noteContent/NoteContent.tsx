@@ -1,6 +1,11 @@
 import React, { useRef, useEffect, useState } from 'react';
 import styles from './NoteContent.module.css';
 import { useNotes } from '@/app/context/NoteContext';
+import Editor from 'react-simple-code-editor';
+import { highlight, languages } from 'prismjs';
+import 'prismjs/components/prism-clike';
+import 'prismjs/components/prism-javascript';
+import 'prismjs/themes/prism-tomorrow.css';
 
 const NoteContent = () => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -38,16 +43,20 @@ const NoteContent = () => {
 
   return (
     <div className={styles.container}>
-      {/* <span className={styles.saveStatus}>
-        {isPending ? 'Alterações pendentes' : 'Salvo'}
-      </span> */}
-
       <textarea
         ref={textareaRef}
         className={styles.noteInput}
         value={content}
         onChange={(e) => setContent(e.target.value)}
         rows={1}
+        spellCheck="false"
+      />
+
+      <Editor
+        value={content}
+        onValueChange={setContent}
+        highlight={(code) => highlight(code, languages.js, 'javascript')}
+        className={styles.noteInput}
       />
     </div>
   );

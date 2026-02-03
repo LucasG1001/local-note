@@ -3,7 +3,7 @@
   min-height: 100vh;
   padding: 2rem;
   color: #f3f4f6;
-  background-color: #131314;
+  background-color: var(--bg-main);
 }
 
 .grid {
@@ -30,14 +30,14 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  background-color: #1E1F20;
+  background-color: #131314;
   padding: 15px;
   border-radius: 10px 10px 0 0;
   margin-bottom: 2px;
 }
 
 .cardBody {
-  background-color: #1E1F20;
+  background-color: #131314;
   padding: 15px;
   border-radius: 0 0 10px 10px;
   margin-top: 2px;
@@ -45,7 +45,6 @@
 
 .cardContent {
     line-height: 1.25rem;
-  font-family: Roboto;
   color: #e3e3e3;
 }
 
