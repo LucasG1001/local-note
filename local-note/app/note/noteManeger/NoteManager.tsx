@@ -1,11 +1,11 @@
 'use client';
 import React, { useState, useMemo } from 'react';
 import Fuse from 'fuse.js';
-import { NoteDetail } from '../NoteDetail';
 import Tags from '../Tags';
-import SearchBar from '../SearchBar';
+import SearchBar from '../searchBar/SearchBar';
 import { useNotes } from '../../context/NoteContext';
 import styles from './NoteManager.module.css';
+import { NoteDetail } from '../noteDetail/NoteDetail';
 
 export default function NoteManager() {
   const { notes, selectedNote, selectNote } = useNotes();
@@ -32,7 +32,6 @@ export default function NoteManager() {
       })),
     });
 
-    // Se digitou algo mas não achou nada
     if (results.length === 0) {
       return { filteredNotes: notes, isNotFound: true };
     }
@@ -42,7 +41,6 @@ export default function NoteManager() {
 
   return (
     <div className={styles.container}>
-      {/* Passamos as tags únicas para o SearchBar decidir o que sugerir */}
       <SearchBar
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}

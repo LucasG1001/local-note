@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { X, Copy, Check, Terminal } from 'lucide-react';
-import Tags from './Tags';
-import NoteContent from './noteContent/NoteContent';
 import styles from './NoteDetail.module.css';
-import { useNotes } from '../context/NoteContext';
+import { useNotes } from '@/app/context/NoteContext';
+import NoteContent from '../noteContent/NoteContent';
 
 export const NoteDetail = () => {
   const [copied, setCopied] = useState(false);

@@ -1,14 +1,14 @@
 import React, { useRef, useEffect, useState } from 'react';
 import styles from './NoteContent.module.css';
-import { useNotes } from '@/app/context/NoteContext';
 import Editor from 'react-simple-code-editor';
 import { highlight, languages } from 'prismjs';
 import 'prismjs/components/prism-clike';
 import 'prismjs/components/prism-javascript';
 import 'prismjs/themes/prism-tomorrow.css';
+import { useNotes } from '@/app/context/NoteContext';
+import AutoResizableTextarea from '@/app/components/AutoResizableTextarea/AutoResizableTextarea';
 
 const NoteContent = () => {
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { selectedNote, updateNote } = useNotes();
   const [content, setContent] = useState(selectedNote?.content || '');
 
@@ -25,39 +25,52 @@ const NoteContent = () => {
     return () => clearTimeout(timer);
   }, [content, isPending, selectedNote, updateNote]);
 
-  const adjustHeight = () => {
-    const textarea = textareaRef.current;
-    if (textarea) {
-      textarea.style.height = 'auto';
-      textarea.style.height = `${textarea.scrollHeight}px`;
-    }
+  const handleBlockChange = (
+    index: number,
+    newValue: string,
+    allBlocks: string[],
+  ) => {
+    const newBlocks = [...allBlocks];
+    newBlocks[index] = newValue;
+    setContent(newBlocks.join(''));
   };
-
-  useEffect(() => {
-    adjustHeight();
-  }, [content]);
 
   if (!selectedNote) {
     return <div className={styles.empty}>Selecione uma nota</div>;
   }
 
+  const blocks = content.split(/(^'''[\s\S]*?''')/gm);
+
+  console.log(blocks[1]);
+
   return (
     <div className={styles.container}>
-      <textarea
-        ref={textareaRef}
-        className={styles.noteInput}
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-        rows={1}
-        spellCheck="false"
-      />
-
-      <Editor
-        value={content}
-        onValueChange={setContent}
-        highlight={(code) => highlight(code, languages.js, 'javascript')}
-        className={styles.noteInput}
-      />
+      <div className={styles.noteContent}>
+        {blocks.map((block, index) => {
+          if (block.startsWith("'''") && block.endsWith("'''")) {
+            return (
+              <Editor
+                key={index}
+                value={block.replaceAll("'''", '')}
+                onValueChange={(code) =>
+                  handleBlockChange(index, `'''${code}'''`, blocks)
+                }
+                highlight={(code) =>
+                  highlight(code, languages.js, 'javascript')
+                }
+                className={styles.noteEditor}
+              />
+            );
+          }
+          return (
+            <AutoResizableTextarea
+              key={index}
+              value={block}
+              onChange={(value) => handleBlockChange(index, value, blocks)}
+            />
+          );
+        })}
+      </div>
     </div>
   );
 };

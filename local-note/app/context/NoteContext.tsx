@@ -18,7 +18,20 @@ const MOCK_NOTES: Note[] = [
     id: 1,
     titulo: 'Exemplo de Hook React',
     tags: ['react', 'frontend'],
-    content: 'Como usar o useEffect de forma eficiente...',
+    content: `
+    1. A Melhor Forma: Template Literals (Crase)
+Introduzidas no ES6, as crases permitem que você quebre a linha naturalmente no código, e o JavaScript respeitará exatamente como você digitou, incluindo os espaços e tabulações.''
+'''
+var payload = new
+{
+    chat_id = _chatId,
+    text = message
+    // Sem parse_mode aqui
+};
+'''
+2. Ajuste no WorkerAlertService.cs (Layout Limpo)
+Para compensar a falta de negrito, usei Letras Maiúsculas nos rótulos e emojis para facilitar o "escaneamento" visual da mensagem.
+    `,
     categoria: 'code',
   },
   {
