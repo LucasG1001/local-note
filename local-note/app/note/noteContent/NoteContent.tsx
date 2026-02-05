@@ -1,75 +1,50 @@
 import React, { useRef, useEffect, useState } from 'react';
 import styles from './NoteContent.module.css';
-import Editor from 'react-simple-code-editor';
-import { highlight, languages } from 'prismjs';
-import 'prismjs/components/prism-clike';
-import 'prismjs/components/prism-javascript';
-import 'prismjs/themes/prism-tomorrow.css';
 import { useNotes } from '@/app/context/NoteContext';
-import AutoResizableTextarea from '@/app/components/AutoResizableTextarea/AutoResizableTextarea';
+import NoteBlock from '../block/NoteBlock';
+import { Block } from '@/app/types/note';
 
 const NoteContent = () => {
   const { selectedNote, updateNote } = useNotes();
-  const [content, setContent] = useState(selectedNote?.content || '');
+  const [content, setContent] = useState<Block[]>(
+    JSON.parse(selectedNote?.content || ''),
+  );
 
-  const isPending = selectedNote && content !== selectedNote.content;
+  const handleBlockChange = (updatedBlock: Block) => {
+    setContent((prevContent) => {
+      const updatedContent = prevContent.map((block) =>
+        block.id === updatedBlock.id ? updatedBlock : block,
+      );
+      return updatedContent;
+    });
+  };
 
   useEffect(() => {
-    if (!isPending || !selectedNote) return;
+    if (!selectedNote) return;
 
     const timer = setTimeout(() => {
-      updateNote(selectedNote.id, { content });
       console.log('Nota salva no backend!');
     }, 10000);
 
     return () => clearTimeout(timer);
-  }, [content, isPending, selectedNote, updateNote]);
-
-  const handleBlockChange = (
-    index: number,
-    newValue: string,
-    allBlocks: string[],
-  ) => {
-    const newBlocks = [...allBlocks];
-    newBlocks[index] = newValue;
-    setContent(newBlocks.join(''));
-  };
+  }, [content, selectedNote, updateNote]);
 
   if (!selectedNote) {
     return <div className={styles.empty}>Selecione uma nota</div>;
   }
 
-  const blocks = content.split(/(^'''[\s\S]*?''')/gm);
-
-  console.log(blocks[1]);
+  console.log(content);
 
   return (
     <div className={styles.container}>
       <div className={styles.noteContent}>
-        {blocks.map((block, index) => {
-          if (block.startsWith("'''") && block.endsWith("'''")) {
-            return (
-              <Editor
-                key={index}
-                value={block.replaceAll("'''", '')}
-                onValueChange={(code) =>
-                  handleBlockChange(index, `'''${code}'''`, blocks)
-                }
-                highlight={(code) =>
-                  highlight(code, languages.js, 'javascript')
-                }
-                className={styles.noteEditor}
-              />
-            );
-          }
-          return (
-            <AutoResizableTextarea
-              key={index}
-              value={block}
-              onChange={(value) => handleBlockChange(index, value, blocks)}
-            />
-          );
-        })}
+        {content.map((block) => (
+          <NoteBlock
+            onChange={handleBlockChange}
+            block={block}
+            key={block.id}
+          />
+        ))}
       </div>
     </div>
   );

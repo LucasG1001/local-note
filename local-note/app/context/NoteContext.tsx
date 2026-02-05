@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState } from 'react';
 import { Note } from '../types/note';
+import language from 'react-syntax-highlighter/dist/esm/languages/hljs/1c';
 // import { Note } from "../types/note";
 
 interface NoteContextType {
@@ -13,40 +14,46 @@ interface NoteContextType {
   selectNote: (note: Note | null) => void;
 }
 
-const MOCK_NOTES: Note[] = [
+const block = [
   {
     id: 1,
-    titulo: 'Exemplo de Hook React',
-    tags: ['react', 'frontend'],
-    content: `
-    1. A Melhor Forma: Template Literals (Crase)
-Introduzidas no ES6, as crases permitem que você quebre a linha naturalmente no código, e o JavaScript respeitará exatamente como você digitou, incluindo os espaços e tabulações.''
-'''
+    type: 'text',
+    value: `
+    2. Validando o JSON
+Para garantir que ninguém insira um texto malformado (um "JSON quebrado"), você pode usar uma Check Constraint. Isso impede que dados inválidos entrem no banco:`,
+  },
+  {
+    id: 2,
+    type: 'code',
+    language: 'javascript',
+    value: `
 var payload = new
 {
     chat_id = _chatId,
     text = message
     // Sem parse_mode aqui
-};
-'''
-2. Ajuste no WorkerAlertService.cs (Layout Limpo)
-Para compensar a falta de negrito, usei Letras Maiúsculas nos rótulos e emojis para facilitar o "escaneamento" visual da mensagem.
-    `,
-    categoria: 'code',
-  },
-  {
-    id: 2,
-    titulo: 'João Silva',
-    tags: ['trabalho', 'dev'],
-    content: 'Telefone: (11) 99999-9999 \nE-mail: joao@email.com',
-    categoria: 'contact',
+};`,
   },
   {
     id: 3,
-    titulo: 'Reunião de Planejamento',
-    tags: ['projeto', 'urgente'],
-    content: 'Segunda-feira às 14:00 no Meet.',
-    categoria: 'event',
+    type: 'code',
+    language: 'sql',
+    value: `
+    CREATE TABLE usuarios (
+    id INTEGER PRIMARY KEY,
+    perfil TEXT CHECK(json_valid(perfil))
+);
+`,
+  },
+];
+
+const MOCK_NOTES: Note[] = [
+  {
+    id: 1,
+    titulo: 'Exemplo de Hook React',
+    tags: ['react', 'frontend'],
+    content: JSON.stringify(block),
+    categoria: 'code',
   },
 ];
 
