@@ -33,7 +33,7 @@ export default function AutoResizableTextarea({
         adjustHeight();
       }}
       rows={1}
-      style={{ ...style, resize: 'none', overflow: 'hidden' }}
+      style={{ ...style, resize: 'none', overflow: 'hidden', width: '100%' }}
       spellCheck="false"
       placeholder="..."
     />

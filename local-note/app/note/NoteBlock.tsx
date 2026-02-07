@@ -14,13 +14,43 @@ import { Copy, Plus } from 'lucide-react';
 interface NoteBlockProps {
   block: Block;
   onChange: (updatedBlock: Block) => void;
+  onAddBlock: (blockId: string) => void;
 }
 
-export default function NoteBlock({ block, onChange }: NoteBlockProps) {
+export default function NoteBlock({
+  block,
+  onChange,
+  onAddBlock,
+}: NoteBlockProps) {
   const { language, type, value } = block;
+
+  if (!block) return null;
 
   const handleValueChange = (newValue: string) => {
     onChange({ ...block, value: newValue });
+  };
+
+  const toggleBlockType = (type: 'text' | 'code') => {
+    onChange({
+      ...block,
+      type: type,
+      language: type === 'code' ? 'javascript' : '',
+    });
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    const isModifier = event.shiftKey;
+
+    if (isModifier) {
+      // Usamos o code para ser mais preciso (KeyT é a tecla T)
+      if (event.code === 'KeyT' || event.code === 'KeyC') {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (event.code === 'KeyT') toggleBlockType('text');
+        if (event.code === 'KeyC') toggleBlockType('code');
+      }
+    }
   };
 
   const lang = language?.toLowerCase() || 'javascript';
@@ -30,7 +60,7 @@ export default function NoteBlock({ block, onChange }: NoteBlockProps) {
     Prism.languages.plain;
 
   return (
-    <div className={styles.blockWrapper}>
+    <div className={styles.blockWrapper} onKeyDown={handleKeyDown}>
       {type === 'text' ? (
         <AutoResizableTextarea value={value} onChange={handleValueChange} />
       ) : (
@@ -52,8 +82,12 @@ export default function NoteBlock({ block, onChange }: NoteBlockProps) {
           />
         </div>
       )}
-      <button className={styles.addButton} title="Adicionar bloco">
-        <Plus size={16} />
+      <button
+        className={styles.addButton}
+        onClick={() => onAddBlock(block.id)}
+        title="Adicionar bloco"
+      >
+        <Plus size={15} />
       </button>
     </div>
   );

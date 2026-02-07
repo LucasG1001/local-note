@@ -3,8 +3,6 @@ import styles from './NoteContent.module.css';
 import { useNotes } from '@/app/context/NoteContext';
 import NoteBlock from './NoteBlock';
 import { Block } from '@/app/types/note';
-import { Copy, Plus } from 'lucide-react';
-import CopyButton from '../components/Buttons/CopyButton';
 
 const NoteContent = () => {
   const { selectedNote, selectNote, updateNote } = useNotes();
@@ -13,6 +11,8 @@ const NoteContent = () => {
   );
 
   const handleBlockChange = (updatedBlock: Block) => {
+    console.log('mudança', updatedBlock);
+
     setContent((prevContent) => {
       const updatedContent = prevContent.map((block) =>
         block.id === updatedBlock.id ? updatedBlock : block,
@@ -21,13 +21,23 @@ const NoteContent = () => {
     });
   };
 
-  const handleAddBlock = () => {
+  const handleAddBlock = (blockId: string) => {
     const newBlock: Block = {
       id: Date.now().toString(),
       type: 'text',
       value: '',
     };
-    setContent((prevContent) => [...prevContent, newBlock]);
+
+    setContent((prevContent) => {
+      const index = prevContent.findIndex((block) => block.id === blockId);
+
+      if (index === -1) return [...prevContent, newBlock];
+      return [
+        ...prevContent.slice(0, index + 1),
+        newBlock,
+        ...prevContent.slice(index + 1),
+      ];
+    });
   };
 
   useEffect(() => {
@@ -51,6 +61,7 @@ const NoteContent = () => {
         {content.map((block) => (
           <NoteBlock
             onChange={handleBlockChange}
+            onAddBlock={handleAddBlock}
             block={block}
             key={block.id}
           />

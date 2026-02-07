@@ -37,25 +37,23 @@
 
 .addButton {
   position: absolute;
-  bottom: -15px;
-  left: 50%;
+  bottom: 15px;
+  left: -20;
   transform: translateX(-50%);
   opacity: 0;
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition: opacity 0.4s ease, transform 0.4s ease;
   cursor: pointer;
-  
-  border-radius: 5px;
-  border: 1px solid #ddd;
   z-index: 10;
+  width: 40px;
+  height: 40px;
+  color: #F3F4F6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .blockWrapper:hover .addButton {
   opacity: 1;
   transform: translateX(-50%) scale(1.2);
-  color: #1E1F20;
+
 }
-/* 
-.addButton:hover {
-  color: #0070f3;
-  background-color: #f0f0f0;
-} */
