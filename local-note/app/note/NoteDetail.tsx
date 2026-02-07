@@ -2,25 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { X, Copy, Check, Terminal } from 'lucide-react';
 import styles from './NoteDetail.module.css';
 import { useNotes } from '@/app/context/NoteContext';
-import NoteContent from '../noteContent/NoteContent';
+import NoteContent from './NoteContent';
 
 export const NoteDetail = () => {
-  const [copied, setCopied] = useState(false);
   const { selectNote, selectedNote, updateNote } = useNotes();
 
-  useEffect(() => {
-    if (copied) {
-      setTimeout(() => setCopied(false), 2000);
-    }
-  }, [copied]);
-
   if (selectedNote === null) return null;
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(selectedNote.content);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
 
   return (
     <div className={styles.overlay}>
@@ -48,15 +35,6 @@ export const NoteDetail = () => {
         <div className={styles.body}>
           <div className={styles.bodyHeader}>
             <h3 className={styles.sectionTitle}>Informação Salva</h3>
-            <button
-              onClick={handleCopy}
-              className={`${styles.copyButton} ${
-                copied ? styles.copyButtonSuccess : styles.copyButtonDefault
-              }`}
-            >
-              {copied ? <Check size={14} /> : <Copy size={14} />}
-              {copied ? 'Copiado!' : 'Copiar'}
-            </button>
           </div>
 
           <NoteContent key={selectedNote.id} />

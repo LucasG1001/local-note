@@ -20,10 +20,9 @@
 .modal {
   position: relative;
   border: 1px solid #333;
-  width: 100%;
-  max-width: 60rem;
+  width: 80%;
   border-radius: 0.5rem;
-  overflow: hidden;
+  overflow-y: scroll;
   animation: modalIn 0.3s ease-out;
   background: #131314;
 }
@@ -94,6 +93,7 @@
 
 .body {
   padding: 1.5rem;
+  padding: 20px 80px;
 }
 
 .bodyHeader {

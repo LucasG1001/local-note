@@ -1,17 +1,16 @@
 'use client';
 import React, { useState, useMemo } from 'react';
 import Fuse from 'fuse.js';
-import Tags from '../Tags';
-import SearchBar from '../searchBar/SearchBar';
-import { useNotes } from '../../context/NoteContext';
+import Tags from './Tags';
+import { useNotes } from '../context/NoteContext';
 import styles from './NoteManager.module.css';
-import { NoteDetail } from '../noteDetail/NoteDetail';
+import { NoteDetail } from './NoteDetail';
+import SearchBar from '../components/SearchBar/SearchBar';
 
 export default function NoteManager() {
   const { notes, selectedNote, selectNote } = useNotes();
   const [searchTerm, setSearchTerm] = useState('');
 
-  // 1. Extrair todas as tags únicas existentes nas notas para o autocomplete
   const allUniqueTags = useMemo(() => {
     const tags = notes.flatMap((note) => note.tags);
     return Array.from(new Set(tags));

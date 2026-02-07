@@ -34,6 +34,8 @@ export default function AutoResizableTextarea({
       }}
       rows={1}
       style={{ ...style, resize: 'none', overflow: 'hidden' }}
+      spellCheck="false"
+      placeholder="..."
     />
   );
 }

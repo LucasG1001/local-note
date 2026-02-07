@@ -1,11 +1,13 @@
 import React, { useRef, useEffect, useState } from 'react';
 import styles from './NoteContent.module.css';
 import { useNotes } from '@/app/context/NoteContext';
-import NoteBlock from '../block/NoteBlock';
+import NoteBlock from './NoteBlock';
 import { Block } from '@/app/types/note';
+import { Copy, Plus } from 'lucide-react';
+import CopyButton from '../components/Buttons/CopyButton';
 
 const NoteContent = () => {
-  const { selectedNote, updateNote } = useNotes();
+  const { selectedNote, selectNote, updateNote } = useNotes();
   const [content, setContent] = useState<Block[]>(
     JSON.parse(selectedNote?.content || ''),
   );
@@ -19,10 +21,20 @@ const NoteContent = () => {
     });
   };
 
+  const handleAddBlock = () => {
+    const newBlock: Block = {
+      id: Date.now().toString(),
+      type: 'text',
+      value: '',
+    };
+    setContent((prevContent) => [...prevContent, newBlock]);
+  };
+
   useEffect(() => {
     if (!selectedNote) return;
 
     const timer = setTimeout(() => {
+      updateNote(selectedNote.id, { content: JSON.stringify(content) });
       console.log('Nota salva no backend!');
     }, 10000);
 
@@ -32,8 +44,6 @@ const NoteContent = () => {
   if (!selectedNote) {
     return <div className={styles.empty}>Selecione uma nota</div>;
   }
-
-  console.log(content);
 
   return (
     <div className={styles.container}>
