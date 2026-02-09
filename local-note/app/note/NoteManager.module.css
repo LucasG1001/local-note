@@ -35,16 +35,30 @@
   margin-bottom: 2px;
 }
 
-.cardBody {
+.cardBody, .cardContent{
   background-color: #131314;
-  padding: 15px;
   border-radius: 0 0 10px 10px;
-  margin-top: 2px;
+
 }
 
 .cardContent {
-    line-height: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  padding: 0 15px;
+
+  gap: 10px;
+  height: 150px;
+  overflow-y: scroll;
+}
+
+.cardBody {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  line-height: 1.25rem;
   color: #e3e3e3;
+  padding: 10px;
+
 }
 
 .cardTitle {

@@ -6,6 +6,11 @@ import { useNotes } from '../context/NoteContext';
 import styles from './NoteManager.module.css';
 import { NoteDetail } from './NoteDetail';
 import SearchBar from '../components/SearchBar/SearchBar';
+import { Block } from '../types/note';
+import NoteContent from './NoteContent';
+import BlockRenderer from './BlockRenderer';
+import AutoResizableTextarea from '../components/AutoResizableTextarea/AutoResizableTextarea';
+import { CodeBlock } from './CodeBlock';
 
 export default function NoteManager() {
   const { notes, selectedNote, selectNote } = useNotes();
@@ -25,17 +30,13 @@ export default function NoteManager() {
     });
 
     const searchTerms = searchTerm.split(' ').filter((term) => term.length > 0);
-    const results = fuse.search({
-      $or: searchTerms.map((term) => ({
-        $or: [{ titulo: term }, { tags: term }],
-      })),
-    });
+    const results = searchTerms.map((term) => fuse.search(term));
 
     if (results.length === 0) {
       return { filteredNotes: notes, isNotFound: true };
     }
 
-    return { filteredNotes: results.map((r) => r.item), isNotFound: false };
+    return { filteredNotes: results.map((r) => r[0].item), isNotFound: false };
   }, [notes, searchTerm]);
 
   return (
@@ -64,7 +65,27 @@ export default function NoteManager() {
               <span className={styles.cardCategory}>{item.categoria}</span>
             </div>
             <div className={styles.cardBody}>
-              <p className={styles.cardContent}>{item.content}</p>
+              <div className={styles.cardContent}>
+                {item.content.map((block) => {
+                  return (
+                    <div key={block.id} className={styles.blockWrapper}>
+                      {block.type === 'text' ? (
+                        <AutoResizableTextarea
+                          value={block.value}
+                          onChange={() => {}}
+                        />
+                      ) : (
+                        <CodeBlock
+                          value={block.value}
+                          language={block.language || 'javascript'}
+                          onChange={() => {}}
+                          editable={false}
+                        />
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
               <Tags item={item} />
             </div>
           </div>

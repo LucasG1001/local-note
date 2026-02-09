@@ -1,25 +1,25 @@
 import React from 'react';
 import { Tag } from 'lucide-react';
-import { InfoCard } from '../types/note';
+import styles from './Tags.module.css'; // Importando o módulo CSS
 
 interface TagsProps {
   item: InfoCard | null;
 }
 
 const Tags = ({ item }: TagsProps) => {
-  if (!item) return null;
+  // Early return se o item ou as tags não existirem
+  if (!item || !item.tags) return null;
+
   return (
-    <div className="mt-2">
-      <div className="flex items-center gap-2 mb-3 text-gray-500">
+    <div className={styles.container}>
+      <header className={styles.header}>
         <Tag size={14} />
-        <span className="text-xs font-bold uppercase">Tags</span>
-      </div>
-      <div className="flex flex-wrap gap-2">
+        <span className={styles.title}>Tags</span>
+      </header>
+
+      <div className={styles.tagsList}>
         {item.tags.map((tag) => (
-          <span
-            key={tag}
-            className="text-[11px] bg-blue-500/10 text-blue-400 px-2 py-1 rounded-md border border-blue-500/20"
-          >
+          <span key={tag} className={styles.tag}>
             #{tag}
           </span>
         ))}

@@ -33,9 +33,7 @@ export const NoteDetail = () => {
         </div>
 
         <div className={styles.body}>
-          <div className={styles.bodyHeader}>
-            <h3 className={styles.sectionTitle}>Informação Salva</h3>
-          </div>
+          <div className={styles.bodyHeader}></div>
 
           <NoteContent key={selectedNote.id} />
 

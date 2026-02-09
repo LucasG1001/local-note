@@ -27,8 +27,8 @@ export default function SearchBar({
 
   const handleSelectSuggestion = (tag: string) => {
     const newWords = [...words];
-    newWords[newWords.length - 1] = tag; // Substitui a palavra incompleta pela tag
-    setSearchTerm(newWords.join(' ') + ' '); // Adiciona um espaço após a tag
+    newWords[newWords.length - 1] = tag;
+    setSearchTerm(newWords.join(' ') + ' ');
     setShowSuggestions(false);
   };
 
@@ -44,7 +44,7 @@ export default function SearchBar({
           setSearchTerm(e.target.value);
           setShowSuggestions(true);
         }}
-        placeholder="Busque por título ou tags..."
+        placeholder="Busque por tags..."
       />
 
       {showSuggestions && filteredSuggestions.length > 0 && (

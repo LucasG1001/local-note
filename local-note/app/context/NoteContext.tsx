@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState } from 'react';
-import { Note } from '../types/note';
+import { Block, Note } from '../types/note';
 import language from 'react-syntax-highlighter/dist/esm/languages/hljs/1c';
 // import { Note } from "../types/note";
 
@@ -14,16 +14,16 @@ interface NoteContextType {
   selectNote: (note: Note | null) => void;
 }
 
-const block = [
+const block: Block[] = [
   {
-    id: 1,
+    id: '1',
     type: 'text',
     value: `
     2. Validando o JSON
 Para garantir que ninguém insira um texto malformado (um "JSON quebrado"), você pode usar uma Check Constraint. Isso impede que dados inválidos entrem no banco:`,
   },
   {
-    id: 2,
+    id: '2',
     type: 'code',
     language: 'javascript',
     value: `
@@ -35,7 +35,7 @@ var payload = new
 };`,
   },
   {
-    id: 3,
+    id: '3',
     type: 'code',
     language: 'sql',
     value: `
@@ -52,7 +52,7 @@ const MOCK_NOTES: Note[] = [
     id: 1,
     titulo: 'Exemplo de Hook React',
     tags: ['react', 'frontend'],
-    content: JSON.stringify(block),
+    content: block,
     categoria: 'code',
   },
 ];
