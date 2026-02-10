@@ -6,14 +6,21 @@ import { useNotes } from '../context/NoteContext';
 import styles from './NoteManager.module.css';
 import { NoteDetail } from './NoteDetail';
 import SearchBar from '../components/SearchBar/SearchBar';
-import { Block } from '../types/note';
-import NoteContent from './NoteContent';
-import BlockRenderer from './BlockRenderer';
 import AutoResizableTextarea from '../components/AutoResizableTextarea/AutoResizableTextarea';
 import { CodeBlock } from './CodeBlock';
+import { Note } from '../types/note';
+
+const emptyNote: Note = {
+  id: crypto.randomUUID(),
+  titulo: '',
+  tags: [],
+  content: [],
+  createdAt: new Date(),
+  updatedAt: new Date(),
+};
 
 export default function NoteManager() {
-  const { notes, selectedNote, selectNote } = useNotes();
+  const { notes, selectedNote, selectNote, addNote } = useNotes();
   const [searchTerm, setSearchTerm] = useState('');
 
   const allUniqueTags = useMemo(() => {
@@ -39,6 +46,8 @@ export default function NoteManager() {
     return { filteredNotes: results.map((r) => r[0].item), isNotFound: false };
   }, [notes, searchTerm]);
 
+  if (!filteredNotes) return null;
+
   return (
     <div className={styles.container}>
       <SearchBar
@@ -54,6 +63,8 @@ export default function NoteManager() {
       )}
 
       <div className={styles.grid}>
+        <button onClick={() => addNote(emptyNote)}>Adicionar nota</button>
+
         {filteredNotes.map((item) => (
           <div
             onClick={() => selectNote(item)}
@@ -62,7 +73,6 @@ export default function NoteManager() {
           >
             <div className={styles.cardHeader}>
               <h3 className={styles.cardTitle}>{item.titulo}</h3>
-              <span className={styles.cardCategory}>{item.categoria}</span>
             </div>
             <div className={styles.cardBody}>
               <div className={styles.cardContent}>

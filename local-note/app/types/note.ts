@@ -6,9 +6,10 @@ export interface Block {
 }
 
 export interface Note {
-  id: number;
+  id: string;
   titulo: string;
   tags: string[];
   content: Block[];
-  categoria: 'code' | 'contact' | 'event' | 'general';
+  createdAt: Date;
+  updatedAt: Date;
 }

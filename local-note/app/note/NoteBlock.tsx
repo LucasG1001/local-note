@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Block } from '@/app/types/note';
 import AutoResizableTextarea from '@/app/components/AutoResizableTextarea/AutoResizableTextarea';
 import styles from './NoteBlock.module.css';
@@ -9,7 +9,7 @@ import { CodeBlock } from './CodeBlock';
 interface NoteBlockProps {
   block: Block;
   onChange: (updatedBlock: Block) => void;
-  onAddBlock: (blockId: string) => void;
+  onAddBlock: () => void;
   onDeleteBlock: (blockId: string) => void;
 }
 
@@ -25,8 +25,6 @@ export default function NoteBlock({
     onAddBlock,
     onDeleteBlock,
   );
-
-  if (!block) return null;
 
   return (
     <div className={styles.blockWrapper} onKeyDown={handleKeyDown}>

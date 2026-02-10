@@ -2,28 +2,26 @@
 
 import React, { createContext, useContext, useState } from 'react';
 import { Block, Note } from '../types/note';
-import language from 'react-syntax-highlighter/dist/esm/languages/hljs/1c';
-// import { Note } from "../types/note";
 
 interface NoteContextType {
   notes: Note[];
   selectedNote: Note | null;
   addNote: (note: Omit<Note, 'id'>) => void;
-  updateNote: (id: number, updatedNote: Partial<Note>) => void;
-  deleteNote: (id: number) => void;
+  updateNote: (id: string, updatedNote: Partial<Note>) => void;
+  deleteNote: (id: string) => void;
   selectNote: (note: Note | null) => void;
 }
 
 const block: Block[] = [
   {
-    id: '1',
+    id: crypto.randomUUID(),
     type: 'text',
     value: `
     2. Validando o JSON
 Para garantir que ninguém insira um texto malformado (um "JSON quebrado"), você pode usar uma Check Constraint. Isso impede que dados inválidos entrem no banco:`,
   },
   {
-    id: '2',
+    id: crypto.randomUUID(),
     type: 'code',
     language: 'javascript',
     value: `
@@ -35,7 +33,7 @@ var payload = new
 };`,
   },
   {
-    id: '3',
+    id: crypto.randomUUID(),
     type: 'code',
     language: 'sql',
     value: `
@@ -49,11 +47,12 @@ var payload = new
 
 const MOCK_NOTES: Note[] = [
   {
-    id: 1,
+    id: crypto.randomUUID(),
     titulo: 'Exemplo de Hook React',
     tags: ['react', 'frontend'],
     content: block,
-    categoria: 'code',
+    createdAt: new Date(),
+    updatedAt: new Date(),
   },
 ];
 
@@ -64,11 +63,11 @@ export function NoteProvider({ children }: { children: React.ReactNode }) {
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
 
   const addNote = (newNote: Omit<Note, 'id'>) => {
-    const noteWithId = { ...newNote, id: Date.now() };
+    const noteWithId = { ...newNote, id: crypto.randomUUID() };
     setNotes((prev) => [...prev, noteWithId]);
   };
 
-  const updateNote = (id: number, updatedFields: Partial<Note>) => {
+  const updateNote = (id: string, updatedFields: Partial<Note>) => {
     setNotes((prev) =>
       prev.map((note) =>
         note.id === id ? { ...note, ...updatedFields } : note,
@@ -79,7 +78,7 @@ export function NoteProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const deleteNote = (id: number) => {
+  const deleteNote = (id: string) => {
     setNotes((prev) => prev.filter((note) => note.id !== id));
     if (selectedNote?.id === id) setSelectedNote(null);
   };

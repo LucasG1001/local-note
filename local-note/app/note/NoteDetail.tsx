@@ -21,7 +21,6 @@ export const NoteDetail = () => {
             </div>
             <div>
               <h2 className={styles.title}>{selectedNote.titulo}</h2>
-              <span className={styles.category}>{selectedNote.categoria}</span>
             </div>
           </div>
           <button
@@ -36,8 +35,6 @@ export const NoteDetail = () => {
           <div className={styles.bodyHeader}></div>
 
           <NoteContent key={selectedNote.id} />
-
-          {/* <Tags /> */}
         </div>
       </div>
     </div>
