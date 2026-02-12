@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, {
   createContext,
@@ -6,13 +6,13 @@ import React, {
   useContext,
   useMemo,
   useState,
-} from 'react';
-import { Block, Note } from '../types/note';
+} from "react";
+import { Block, Note } from "../types/note";
 
 interface NoteContextType {
   notes: Note[];
   selectedNote: Note | null;
-  addNote: (note: Omit<Note, 'id'>) => void;
+  addNote: (note: Omit<Note, "id">) => void;
   updateNote: (id: string, updatedNote: Partial<Note>) => void;
   deleteNote: (id: string) => void;
   setSelectedNoteId: (id: string | null) => void;
@@ -24,15 +24,15 @@ interface NoteContextType {
 const block: Block[] = [
   {
     id: crypto.randomUUID(),
-    type: 'text',
+    type: "text",
     value: `
     2. Validando o JSON
 Para garantir que ninguém insira um texto malformado (um "JSON quebrado"), você pode usar uma Check Constraint. Isso impede que dados inválidos entrem no banco:`,
   },
   {
     id: crypto.randomUUID(),
-    type: 'code',
-    language: 'javascript',
+    type: "code",
+    language: "javascript",
     value: `
 var payload = new
 {
@@ -43,8 +43,8 @@ var payload = new
   },
   {
     id: crypto.randomUUID(),
-    type: 'code',
-    language: 'sql',
+    type: "code",
+    language: "sql",
     value: `
     CREATE TABLE usuarios (
     id INTEGER PRIMARY KEY,
@@ -57,8 +57,8 @@ var payload = new
 const MOCK_NOTES: Note[] = [
   {
     id: crypto.randomUUID(),
-    titulo: 'Exemplo de Hook React',
-    tags: ['react', 'frontend'],
+    titulo: "Exemplo de Hook React",
+    tags: ["react", "frontend"],
     content: block,
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -72,10 +72,21 @@ export function NoteProvider({ children }: { children: React.ReactNode }) {
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
 
   const selectedNote = useMemo(() => {
-    return notes.find((n) => n.id === selectedNoteId) || null;
+    const selectedNote = notes.find((n) => n.id === selectedNoteId);
+    if (selectedNote?.content.length === 0) {
+      selectedNote.titulo = "";
+      selectedNote.content = [
+        {
+          id: crypto.randomUUID(),
+          type: "text",
+          value: "...",
+        },
+      ];
+    }
+    return selectedNote || null;
   }, [notes, selectedNoteId]);
 
-  const addNote = (newNote: Omit<Note, 'id'>) => {
+  const addNote = (newNote: Omit<Note, "id">) => {
     const noteWithId: Note = {
       ...newNote,
       id: crypto.randomUUID(),
@@ -98,7 +109,7 @@ export function NoteProvider({ children }: { children: React.ReactNode }) {
 
   const updateBlock = useCallback(
     (id: string, updatedBlock: Partial<Block>) => {
-      console.log('Atualizando', updatedBlock, id);
+      console.log("Atualizando", updatedBlock, id);
 
       setNotes((prev) =>
         prev.map((note) =>
@@ -142,8 +153,8 @@ export function NoteProvider({ children }: { children: React.ReactNode }) {
                 ...note.content,
                 {
                   id: crypto.randomUUID(),
-                  type: 'text',
-                  value: '',
+                  type: "text",
+                  value: "",
                 },
               ],
             }
@@ -179,7 +190,7 @@ export function NoteProvider({ children }: { children: React.ReactNode }) {
 export function useNotes() {
   const context = useContext(NoteContext);
   if (!context) {
-    throw new Error('useNotes deve ser usado dentro de um NoteProvider');
+    throw new Error("useNotes deve ser usado dentro de um NoteProvider");
   }
   return context;
 }

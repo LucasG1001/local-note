@@ -1,10 +1,10 @@
-import { X, Terminal } from 'lucide-react';
-import styles from './NoteDetail.module.css';
-import { useNotes } from '@/app/context/NoteContext';
-import NoteContent from './NoteContent';
+import { X, Terminal } from "lucide-react";
+import styles from "./NoteDetail.module.css";
+import { useNotes } from "@/app/context/NoteContext";
+import NoteContent from "./NoteContent";
 
 export const NoteDetail = () => {
-  const { selectedNote, setSelectedNoteId } = useNotes();
+  const { selectedNote, setSelectedNoteId, updateNote } = useNotes();
 
   if (!selectedNote) return null;
 
@@ -21,9 +21,15 @@ export const NoteDetail = () => {
             <div className={styles.iconContainer}>
               <Terminal size={20} />
             </div>
-            <div>
-              <h2 className={styles.title}>{selectedNote.titulo}</h2>
-            </div>
+            <input
+              type="text"
+              className={styles.title}
+              value={selectedNote.titulo}
+              spellCheck="false"
+              onChange={(e) =>
+                updateNote(selectedNote.id, { titulo: e.target.value })
+              }
+            />
           </div>
           <button
             onClick={() => setSelectedNoteId(null)}
@@ -34,8 +40,6 @@ export const NoteDetail = () => {
         </div>
 
         <div className={styles.body}>
-          <div className={styles.bodyHeader}></div>
-
           <NoteContent key={selectedNote.id} />
         </div>
       </div>
