@@ -1,6 +1,6 @@
 export interface Block {
   id: string;
-  type: 'text' | 'code';
+  type: "text" | "code";
   language?: string;
   value: string;
 }
@@ -13,3 +13,5 @@ export interface Note {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export type NewNote = Omit<Note, "id" | "createdAt" | "updatedAt">;

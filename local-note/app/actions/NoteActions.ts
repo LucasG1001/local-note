@@ -1,128 +1,93 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { prisma } from "../lib/prisma";
-import { Note, NoteSection, Tag } from "@prisma/client";
+import { Note, Block, NewNote } from "../types/note";
+import { revalidatePath } from "next/cache";
 
-export type SectionType = "text" | "code";
+export async function getNotesAction(): Promise<{
+  success: boolean;
+  data?: Note[];
+  error?: string;
+}> {
+  try {
+    const notes = await prisma.note.findMany({
+      include: { tags: true },
+      orderBy: { createdAt: "desc" },
+    });
 
-export type CreateNoteDTO = {
-  title: string;
-  tags: { name: string }[];
-  sections: {
-    text: string;
-    type: SectionType;
-  }[];
-};
+    const formattedNotes: Note[] | [] = notes.map((note) => ({
+      id: note.id,
+      titulo: note.titulo,
+      content: JSON.parse(note.content) as Block[],
+      tags: note.tags.map((t) => t.name),
+      createdAt: note.createdAt,
+      updatedAt: note.updatedAt,
+    }));
 
-export type UpdateNoteDTO = {
-  id: string;
-  title?: string;
-  sections?: {
-    id: string;
-    text?: string;
-    type?: SectionType;
-  }[];
-  tags?: {
-    id?: string;
-    name: string;
-  }[];
-};
-
-export type NoteResponseDTO = Note & { tags: Tag[]; sections: NoteSection[] };
-
-export async function createNote(data: CreateNoteDTO) {
-  const note = await prisma.note.create({
-    data: {
-      title: data.title,
-      tags: {
-        create: data.tags,
-      },
-      sections: {
-        create: data.sections,
-      },
-    },
-  });
-
-  revalidatePath("/");
+    return { success: true, data: formattedNotes };
+  } catch (error) {
+    return { success: false, error: "Falha ao buscar notas" };
+  }
 }
 
-export async function addSectionToNote(
-  noteId: string,
-  section: { text: string; type: SectionType }
-) {
-  const noteExists = await prisma.note.findUnique({
-    where: { id: noteId },
-  });
+interface ActionResponse {
+  success: boolean;
+  data?: Note;
+  error?: string;
+}
 
-  if (!noteExists) {
-    throw new Error("Note not found");
-  }
-
-  const note = await prisma.note.update({
-    where: { id: noteId },
-    data: {
-      sections: {
-        create: {
-          text: section.text,
-          type: section.type,
+export async function createNoteAction(note: NewNote): Promise<ActionResponse> {
+  try {
+    const newNote = await prisma.note.create({
+      data: {
+        titulo: note.titulo,
+        content: JSON.stringify(note.content),
+        tags: {
+          create: note.tags.map((tagName) => ({ name: tagName })),
         },
       },
-    },
-    include: { sections: true },
-  });
+      include: { tags: true },
+    });
 
-  return note.sections;
+    revalidatePath("/");
+    return { success: true, data: newNote as unknown as Note };
+  } catch (error) {
+    console.error("Erro ao criar:", error);
+    return { success: false, error: "Falha ao criar a nota." };
+  }
 }
 
-export async function UpdateNote(data: UpdateNoteDTO) {
-  const { id, title, sections, tags } = data;
+export async function updateNoteAction(note: Note): Promise<ActionResponse> {
+  try {
+    const updatedNote = await prisma.note.update({
+      where: { id: note.id },
+      data: {
+        titulo: note.titulo,
+        content: JSON.stringify(note.content),
+        tags: {
+          deleteMany: {}, // Remove relações antigas
+          create: note.tags.map((tagName) => ({ name: tagName })),
+        },
+      },
+      include: { tags: true },
+    });
 
-  if (!id) throw new Error("Note id is required");
+    revalidatePath("/");
+    return { success: true, data: updatedNote as unknown as Note };
+  } catch (error) {
+    console.error("Erro ao atualizar:", error);
+    return { success: false, error: "Falha ao atualizar a nota." };
+  }
+}
 
-  if (title) {
-    await prisma.note.update({
+export async function deleteNoteAction(id: string) {
+  try {
+    await prisma.note.delete({
       where: { id },
-      data: { title },
     });
+    revalidatePath("/");
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: "Falha ao eliminar." };
   }
-
-  if (sections?.length) {
-    await prisma.$transaction(
-      sections.map((section) =>
-        prisma.noteSection.update({
-          where: { id: section.id },
-          data: {
-            ...(section.text !== undefined && { text: section.text }),
-            ...(section.type !== undefined && { type: section.type }),
-          },
-        })
-      )
-    );
-  }
-
-  if (tags) {
-    await prisma.tag.deleteMany({
-      where: { noteId: id },
-    });
-
-    await prisma.tag.createMany({
-      data: tags.map((tag) => ({
-        name: tag.name,
-        noteId: id,
-      })),
-    });
-  }
-
-  revalidatePath("/");
-}
-
-export async function getNotes(): Promise<NoteResponseDTO[]> {
-  return prisma.note.findMany({
-    include: {
-      tags: true,
-      sections: true,
-    },
-    orderBy: { createdAt: "desc" },
-  });
 }
