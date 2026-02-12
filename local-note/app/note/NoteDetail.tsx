@@ -1,17 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { X, Copy, Check, Terminal } from 'lucide-react';
+import { X, Terminal } from 'lucide-react';
 import styles from './NoteDetail.module.css';
 import { useNotes } from '@/app/context/NoteContext';
 import NoteContent from './NoteContent';
 
 export const NoteDetail = () => {
-  const { selectNote, selectedNote, updateNote } = useNotes();
+  const { selectedNote, setSelectedNoteId } = useNotes();
 
-  if (selectedNote === null) return null;
+  if (!selectedNote) return null;
 
   return (
     <div className={styles.overlay}>
-      <div className={styles.backdrop} onClick={() => selectNote(null)} />
+      <div
+        className={styles.backdrop}
+        onClick={() => setSelectedNoteId(null)}
+      />
 
       <div className={styles.modal}>
         <div className={styles.header}>
@@ -24,7 +26,7 @@ export const NoteDetail = () => {
             </div>
           </div>
           <button
-            onClick={() => selectNote(null)}
+            onClick={() => setSelectedNoteId(null)}
             className={styles.closeButton}
           >
             <X size={20} />

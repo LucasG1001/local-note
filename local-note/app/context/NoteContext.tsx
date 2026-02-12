@@ -1,6 +1,12 @@
 'use client';
 
-import React, { createContext, useContext, useState } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+} from 'react';
 import { Block, Note } from '../types/note';
 
 interface NoteContextType {
@@ -9,7 +15,10 @@ interface NoteContextType {
   addNote: (note: Omit<Note, 'id'>) => void;
   updateNote: (id: string, updatedNote: Partial<Note>) => void;
   deleteNote: (id: string) => void;
-  selectNote: (note: Note | null) => void;
+  setSelectedNoteId: (id: string | null) => void;
+  updateBlock: (id: string, updatedBlock: Partial<Block>) => void;
+  deleteBlock: (id: string) => void;
+  addBlock: () => void;
 }
 
 const block: Block[] = [
@@ -60,31 +69,92 @@ const NoteContext = createContext<NoteContextType | undefined>(undefined);
 
 export function NoteProvider({ children }: { children: React.ReactNode }) {
   const [notes, setNotes] = useState<Note[]>(MOCK_NOTES);
-  const [selectedNote, setSelectedNote] = useState<Note | null>(null);
+  const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
+
+  const selectedNote = useMemo(() => {
+    return notes.find((n) => n.id === selectedNoteId) || null;
+  }, [notes, selectedNoteId]);
 
   const addNote = (newNote: Omit<Note, 'id'>) => {
-    const noteWithId = { ...newNote, id: crypto.randomUUID() };
-    setNotes((prev) => [...prev, noteWithId]);
+    const noteWithId: Note = {
+      ...newNote,
+      id: crypto.randomUUID(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    setNotes((prev) => [noteWithId, ...prev]);
+    setSelectedNoteId(noteWithId.id);
   };
 
-  const updateNote = (id: string, updatedFields: Partial<Note>) => {
+  const updateNote = useCallback((id: string, updatedFields: Partial<Note>) => {
     setNotes((prev) =>
       prev.map((note) =>
-        note.id === id ? { ...note, ...updatedFields } : note,
+        note.id === id
+          ? { ...note, ...updatedFields, updatedAt: new Date() }
+          : note,
       ),
     );
-    if (selectedNote?.id === id) {
-      setSelectedNote((prev) => (prev ? { ...prev, ...updatedFields } : null));
-    }
-  };
+  }, []);
+
+  const updateBlock = useCallback(
+    (id: string, updatedBlock: Partial<Block>) => {
+      console.log('Atualizando', updatedBlock, id);
+
+      setNotes((prev) =>
+        prev.map((note) =>
+          note.id === selectedNoteId
+            ? {
+                ...note,
+                content: note.content.map((block) =>
+                  block.id === id ? { ...block, ...updatedBlock } : block,
+                ),
+              }
+            : note,
+        ),
+      );
+    },
+    [selectedNoteId],
+  );
+
+  const deleteBlock = useCallback(
+    (id: string) => {
+      setNotes((prev) =>
+        prev.map((note) =>
+          note.id === selectedNoteId
+            ? {
+                ...note,
+                content: note.content.filter((block) => block.id !== id),
+              }
+            : note,
+        ),
+      );
+    },
+    [selectedNoteId],
+  );
+
+  const addBlock = useCallback(() => {
+    setNotes((prev) =>
+      prev.map((note) =>
+        note.id === selectedNoteId
+          ? {
+              ...note,
+              content: [
+                ...note.content,
+                {
+                  id: crypto.randomUUID(),
+                  type: 'text',
+                  value: '',
+                },
+              ],
+            }
+          : note,
+      ),
+    );
+  }, [selectedNoteId]);
 
   const deleteNote = (id: string) => {
-    setNotes((prev) => prev.filter((note) => note.id !== id));
-    if (selectedNote?.id === id) setSelectedNote(null);
-  };
-
-  const selectNote = (note: Note | null) => {
-    setSelectedNote(note);
+    setNotes((prev) => prev.filter((n) => n.id !== id));
+    if (selectedNoteId === id) setSelectedNoteId(null);
   };
 
   return (
@@ -95,7 +165,10 @@ export function NoteProvider({ children }: { children: React.ReactNode }) {
         addNote,
         updateNote,
         deleteNote,
-        selectNote,
+        setSelectedNoteId,
+        updateBlock,
+        deleteBlock,
+        addBlock,
       }}
     >
       {children}

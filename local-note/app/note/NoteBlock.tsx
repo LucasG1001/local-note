@@ -3,41 +3,45 @@ import React, { useEffect } from 'react';
 import { Block } from '@/app/types/note';
 import AutoResizableTextarea from '@/app/components/AutoResizableTextarea/AutoResizableTextarea';
 import styles from './NoteBlock.module.css';
-import { useNoteBlock } from '../hooks/useNoteBlocks';
 import { CodeBlock } from './CodeBlock';
+import { useNotes } from '../context/NoteContext';
 
 interface NoteBlockProps {
   block: Block;
-  onChange: (updatedBlock: Block) => void;
-  onAddBlock: () => void;
-  onDeleteBlock: (blockId: string) => void;
 }
 
-export default function NoteBlock({
-  block,
-  onChange,
-  onAddBlock,
-  onDeleteBlock,
-}: NoteBlockProps) {
-  const { handleValueChange, handleKeyDown } = useNoteBlock(
-    block,
-    onChange,
-    onAddBlock,
-    onDeleteBlock,
-  );
+export default function NoteBlock({ block }: NoteBlockProps) {
+  const { updateBlock, deleteBlock, addBlock } = useNotes();
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (!event.shiftKey) return;
+
+    const actions: Record<string, () => void> = {
+      KeyT: () => updateBlock(block.id, { type: 'text' }),
+      KeyC: () => updateBlock(block.id, { type: 'code' }),
+      Enter: () => addBlock(),
+      Delete: () => deleteBlock(block.id),
+    };
+
+    const action = actions[event.code];
+    if (action) {
+      event.preventDefault();
+      action();
+    }
+  };
+
+  const handleChange = (value: string) => {
+    updateBlock(block.id, { value: value });
+  };
 
   return (
     <div className={styles.blockWrapper} onKeyDown={handleKeyDown}>
       {block.type === 'text' ? (
-        <AutoResizableTextarea
-          value={block.value}
-          onChange={handleValueChange}
-        />
+        <AutoResizableTextarea value={block.value} onChange={handleChange} />
       ) : (
         <CodeBlock
           value={block.value}
           language={block.language || 'javascript'}
-          onChange={handleValueChange}
+          onChange={handleChange}
           editable={true}
         />
       )}

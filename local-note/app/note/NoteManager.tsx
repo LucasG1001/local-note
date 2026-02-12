@@ -20,7 +20,7 @@ const emptyNote: Note = {
 };
 
 export default function NoteManager() {
-  const { notes, selectedNote, selectNote, addNote } = useNotes();
+  const { notes, selectedNote, setSelectedNoteId, addNote } = useNotes();
   const [searchTerm, setSearchTerm] = useState('');
 
   const allUniqueTags = useMemo(() => {
@@ -67,7 +67,7 @@ export default function NoteManager() {
 
         {filteredNotes.map((item) => (
           <div
-            onClick={() => selectNote(item)}
+            onClick={() => setSelectedNoteId(item.id)}
             key={item.id}
             className={styles.card}
           >
