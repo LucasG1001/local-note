@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Block } from '@/app/types/note';
 import AutoResizableTextarea from '@/app/components/AutoResizableTextarea/AutoResizableTextarea';
 import styles from './NoteBlock.module.css';
@@ -11,13 +11,42 @@ interface NoteBlockProps {
 }
 
 export default function NoteBlock({ block }: NoteBlockProps) {
-  const { updateBlock, deleteBlock, addBlock } = useNotes();
+  const { setActiveNote, activeNote } = useNotes();
+
+  if (!activeNote) return null;
+
+  const updateBlock = (id: string, updatedFields: Partial<Block>) => {
+    const newBlocks = activeNote.content.map((b) =>
+      b.id === id ? { ...b, ...updatedFields } : b,
+    );
+
+    setActiveNote({ ...activeNote, content: newBlocks });
+  };
+
+  const deleteBlock = (id: string) => {
+    const newBlocks = activeNote.content.filter((b) => b.id !== id);
+    setActiveNote({ ...activeNote, content: newBlocks });
+  };
+
+  const addBlock = () => {
+    const newBlock: Block = {
+      id: crypto.randomUUID(),
+      type: 'text',
+      value: '',
+    };
+    setActiveNote({
+      ...activeNote,
+      content: [...activeNote.content, newBlock],
+    });
+  };
+
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (!event.shiftKey) return;
 
     const actions: Record<string, () => void> = {
       KeyT: () => updateBlock(block.id, { type: 'text' }),
-      KeyC: () => updateBlock(block.id, { type: 'code' }),
+      KeyC: () =>
+        updateBlock(block.id, { type: 'code', language: 'javascript' }),
       Enter: () => addBlock(),
       Delete: () => deleteBlock(block.id),
     };

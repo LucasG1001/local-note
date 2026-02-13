@@ -13,7 +13,6 @@ export default function SearchBar({
   setSearchTerm,
   suggestions,
 }: SearchBarProps) {
-  const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
   // Pega a última palavra digitada

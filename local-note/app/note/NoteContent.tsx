@@ -1,12 +1,29 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styles from './NoteContent.module.css';
 import NoteBlock from './NoteBlock';
 import { useNotes } from '../context/NoteContext';
+import Tags from './Tags';
 
 const NoteContent = () => {
-  const { selectedNote } = useNotes();
+  const { activeNote, setActiveNote } = useNotes();
 
-  if (!selectedNote) {
+  useEffect(() => {
+    if (activeNote && activeNote.content.length === 0) {
+      setActiveNote({
+        ...activeNote,
+        content: [
+          {
+            id: crypto.randomUUID(),
+            type: 'text',
+            language: 'javascript',
+            value: '',
+          },
+        ],
+      });
+    }
+  }, [activeNote, setActiveNote]);
+
+  if (!activeNote) {
     return <div className={styles.empty}>Selecione uma nota</div>;
   }
 
@@ -17,7 +34,7 @@ const NoteContent = () => {
       </header>
 
       <div className={styles.noteContent}>
-        {selectedNote.content.map((block) => (
+        {activeNote.content.map((block) => (
           <NoteBlock key={block.id} block={block} />
         ))}
       </div>

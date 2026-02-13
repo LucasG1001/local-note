@@ -1,19 +1,26 @@
-import { X, Terminal } from "lucide-react";
-import styles from "./NoteDetail.module.css";
-import { useNotes } from "@/app/context/NoteContext";
-import NoteContent from "./NoteContent";
+import { X, Terminal } from 'lucide-react';
+import styles from './NoteDetail.module.css';
+import { useNotes } from '@/app/context/NoteContext';
+import NoteContent from './NoteContent';
+import Tags from './Tags';
+import { useState } from 'react';
 
 export const NoteDetail = () => {
-  const { selectedNote, setSelectedNoteId, updateNote } = useNotes();
+  const { activeNote, setActiveNote } = useNotes();
+  const [tag, setTag] = useState('');
 
-  if (!selectedNote) return null;
+  if (!activeNote) return null;
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.code === 'Space') {
+      setActiveNote({ ...activeNote, tags: [...activeNote.tags, tag] });
+      setTag('');
+    }
+  };
 
   return (
     <div className={styles.overlay}>
-      <div
-        className={styles.backdrop}
-        onClick={() => setSelectedNoteId(null)}
-      />
+      <div className={styles.backdrop} onClick={() => setActiveNote(null)} />
 
       <div className={styles.modal}>
         <div className={styles.header}>
@@ -24,23 +31,32 @@ export const NoteDetail = () => {
             <input
               type="text"
               className={styles.title}
-              value={selectedNote.titulo}
+              value={activeNote.titulo}
               spellCheck="false"
               onChange={(e) =>
-                updateNote(selectedNote.id, { titulo: e.target.value })
+                setActiveNote({ ...activeNote, titulo: e.target.value })
               }
             />
           </div>
           <button
-            onClick={() => setSelectedNoteId(null)}
+            onClick={() => setActiveNote(null)}
             className={styles.closeButton}
           >
             <X size={20} />
           </button>
         </div>
+        <div className={styles.tags}>
+          <Tags item={activeNote} />
+          <input
+            type="text"
+            value={tag}
+            onKeyDown={handleKeyDown}
+            onChange={(e) => setTag(e.target.value)}
+          />
+        </div>
 
         <div className={styles.body}>
-          <NoteContent key={selectedNote.id} />
+          <NoteContent key={activeNote.id} />
         </div>
       </div>
     </div>

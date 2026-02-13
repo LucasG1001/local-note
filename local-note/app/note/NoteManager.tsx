@@ -1,25 +1,25 @@
-"use client";
-import { useState, useMemo } from "react";
-import Fuse from "fuse.js";
-import Tags from "./Tags";
-import { useNotes } from "../context/NoteContext";
-import styles from "./NoteManager.module.css";
-import { NoteDetail } from "./NoteDetail";
-import SearchBar from "../components/SearchBar/SearchBar";
-import AutoResizableTextarea from "../components/AutoResizableTextarea/AutoResizableTextarea";
-import { CodeBlock } from "./CodeBlock";
-import { NewNote, Note } from "../types/note";
-import ConfirmationModal from "../components/modal/ConfirmationModal";
+'use client';
+import { useState, useMemo } from 'react';
+import Fuse from 'fuse.js';
+import Tags from './Tags';
+import { useNotes } from '../context/NoteContext';
+import styles from './NoteManager.module.css';
+import { NoteDetail } from './NoteDetail';
+import SearchBar from '../components/SearchBar/SearchBar';
+import AutoResizableTextarea from '../components/AutoResizableTextarea/AutoResizableTextarea';
+import { CodeBlock } from './CodeBlock';
+import { NewNote, Note } from '../types/note';
+import ConfirmationModal from '../components/modal/ConfirmationModal';
 
 const emptyNote: NewNote = {
-  titulo: "",
+  titulo: '',
   tags: [],
   content: [],
 };
 
 export default function NoteManager() {
   const { notes, saveNote, deleteNote, activeNote, setActiveNote } = useNotes();
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [noteIdToDelete, setNoteToDelete] = useState<Note | null>(null);
@@ -40,11 +40,11 @@ export default function NoteManager() {
 
   return (
     <div className={styles.container}>
-      {/* <SearchBar
+      <SearchBar
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
-        suggestions={allUniqueTags}
-      /> */}
+        suggestions={[]}
+      />
 
       <div className={styles.grid}>
         <button onClick={() => saveNote(emptyNote)}>Adicionar nota</button>
@@ -74,7 +74,7 @@ export default function NoteManager() {
                   {item.content.map((block) => {
                     return (
                       <div key={block.id} className={styles.blockWrapper}>
-                        {block.type === "text" ? (
+                        {block.type === 'text' ? (
                           <AutoResizableTextarea
                             value={block.value}
                             onChange={() => {}}
@@ -82,7 +82,7 @@ export default function NoteManager() {
                         ) : (
                           <CodeBlock
                             value={block.value}
-                            language={block.language || "javascript"}
+                            language={block.language || 'javascript'}
                             onChange={() => {}}
                             editable={false}
                           />

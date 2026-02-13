@@ -40,16 +40,17 @@
 }
 
 .header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
   padding: 1.5rem;
+  background-color: #131314;
   border-bottom: 1px solid #333;
 }
 
 .headerInfo {
   display: flex;
-  align-items: center;
+  align-items: top;
   gap: 0.75rem;
   width: 100%;
 }
@@ -72,6 +73,12 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.titleContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .category {
@@ -138,4 +145,9 @@
 .copyButtonSuccess {
   background-color: #16a34a;
   color: white;
+}
+
+.tags {
+  display: flex;
+  gap: 0.5rem;
 }

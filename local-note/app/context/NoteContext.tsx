@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, {
   createContext,
@@ -6,9 +6,14 @@ import React, {
   useEffect,
   useState,
   useTransition,
-} from "react";
-import { NewNote, Note } from "../types/note";
-import { deleteNoteAction, createNoteAction } from "../actions/NoteActions";
+  useRef,
+} from 'react';
+import { NewNote, Note } from '../types/note';
+import {
+  deleteNoteAction,
+  createNoteAction,
+  updateNoteAction,
+} from '../actions/NoteActions';
 
 interface NoteContextType {
   notes: Note[];
@@ -32,17 +37,39 @@ export function NoteProvider({
   const [activeNote, setActiveNote] = useState<Note | null>(null);
   const [isPending, startTransition] = useTransition();
 
+  const isInitialMount = useRef(true);
+
   useEffect(() => {
     setNotes(initialNotes);
   }, [initialNotes]);
 
+  useEffect(() => {
+    if (!activeNote) return;
+
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      console.log('Atualizando nota');
+      startTransition(async () => {
+        const result = await updateNoteAction(activeNote);
+        if (!result.success) {
+          console.error(result.error);
+        }
+      });
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [activeNote]);
+
   const saveNote = async (note: NewNote) => {
     startTransition(async () => {
       const result = await createNoteAction(note);
-
       if (!result.success) {
         console.error(result.error);
-        alert("Erro ao salvar");
+        alert('Erro ao salvar');
       }
     });
   };
@@ -73,6 +100,6 @@ export function NoteProvider({
 export function useNotes() {
   const context = useContext(NoteContext);
   if (!context)
-    throw new Error("useNotes deve ser usado dentro de um NoteProvider");
+    throw new Error('useNotes deve ser usado dentro de um NoteProvider');
   return context;
 }

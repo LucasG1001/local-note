@@ -1,8 +1,8 @@
-"use server";
+'use server';
 
-import { prisma } from "../lib/prisma";
-import { Note, Block, NewNote } from "../types/note";
-import { revalidatePath } from "next/cache";
+import { prisma } from '../lib/prisma';
+import { Note, Block, NewNote } from '../types/note';
+import { revalidatePath } from 'next/cache';
 
 export async function getNotesAction(): Promise<{
   success: boolean;
@@ -12,7 +12,7 @@ export async function getNotesAction(): Promise<{
   try {
     const notes = await prisma.note.findMany({
       include: { tags: true },
-      orderBy: { createdAt: "desc" },
+      orderBy: { createdAt: 'desc' },
     });
 
     const formattedNotes: Note[] | [] = notes.map((note) => ({
@@ -26,7 +26,7 @@ export async function getNotesAction(): Promise<{
 
     return { success: true, data: formattedNotes };
   } catch (error) {
-    return { success: false, error: "Falha ao buscar notas" };
+    return { success: false, error: 'Falha ao buscar notas' };
   }
 }
 
@@ -49,11 +49,11 @@ export async function createNoteAction(note: NewNote): Promise<ActionResponse> {
       include: { tags: true },
     });
 
-    revalidatePath("/");
+    revalidatePath('/');
     return { success: true, data: newNote as unknown as Note };
   } catch (error) {
-    console.error("Erro ao criar:", error);
-    return { success: false, error: "Falha ao criar a nota." };
+    console.error('Erro ao criar:', error);
+    return { success: false, error: 'Falha ao criar a nota.' };
   }
 }
 
@@ -72,11 +72,11 @@ export async function updateNoteAction(note: Note): Promise<ActionResponse> {
       include: { tags: true },
     });
 
-    revalidatePath("/");
+    revalidatePath('/');
     return { success: true, data: updatedNote as unknown as Note };
   } catch (error) {
-    console.error("Erro ao atualizar:", error);
-    return { success: false, error: "Falha ao atualizar a nota." };
+    console.error('Erro ao atualizar:', error);
+    return { success: false, error: 'Falha ao atualizar a nota.' };
   }
 }
 
@@ -85,9 +85,9 @@ export async function deleteNoteAction(id: string) {
     await prisma.note.delete({
       where: { id },
     });
-    revalidatePath("/");
+    revalidatePath('/');
     return { success: true };
   } catch (error) {
-    return { success: false, error: "Falha ao eliminar." };
+    return { success: false, error: 'Falha ao eliminar.' };
   }
 }
