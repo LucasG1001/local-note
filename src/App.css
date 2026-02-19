@@ -18,7 +18,7 @@
 }
 
 body {
-  font-family: "Inter", sans-serif;
+  font-family: "Roboto", sans-serif;
   background-color: var(--bg-main);
   color: var(--text-main);
 }
@@ -37,6 +37,8 @@ a {
 input,
 textarea {
   outline: none;
+  background: transparent;
+  border: none;
 }
 
 ::-webkit-scrollbar {

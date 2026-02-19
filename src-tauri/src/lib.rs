@@ -2,20 +2,20 @@ use serde::{Serialize, Deserialize};
 use uuid::Uuid;
 use tauri::Manager;
 use sqlx::sqlite::{SqliteConnectOptions, SqlitePool};
+use chrono::{DateTime, Utc};
 
 #[derive(Serialize, Deserialize, sqlx::FromRow, Clone)]
 pub struct Note {
     pub id: String,
-    pub titulo: String,
+    pub title: String,
     pub content: String,
     #[serde(rename = "createdAt")]
     #[sqlx(rename = "createdAt")]
-    pub created_at: String,
+    pub created_at: DateTime<Utc>, 
     #[serde(rename = "updatedAt")]
     #[sqlx(rename = "updatedAt")]
-    pub updated_at: String,
+    pub updated_at: DateTime<Utc>,
 }
-
 #[tauri::command]
 async fn get_notes(
     pool: tauri::State<'_, SqlitePool> 
@@ -31,20 +31,55 @@ async fn get_notes(
 #[tauri::command]
 async fn create_note(
     pool: tauri::State<'_, SqlitePool>, 
-    titulo: String, 
+    title: String, 
     content: String
 ) -> Result<String, String> {
     let new_id = Uuid::new_v4().to_string();
+    let now = Utc::now();
 
-    sqlx::query("INSERT INTO Note (id, titulo, content, createdAt, updatedAt) VALUES (?, ?, ?, datetime('now'), datetime('now'))")
+    sqlx::query("INSERT INTO Note (id, title, content, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?)")
         .bind(&new_id)
-        .bind(titulo)
+        .bind(title)
         .bind(content)
+        .bind(now)
+        .bind(now)
         .execute(pool.inner())
         .await
         .map_err(|e| e.to_string())?;
 
     Ok(new_id)
+}
+
+#[tauri::command]
+async fn update_note(
+    pool: tauri::State<'_, SqlitePool>,
+    id: String,
+    title: String,
+    content: String,
+) -> Result<(), String> {
+    sqlx::query("UPDATE Note SET title = ?, content = ?, updatedAt = datetime('now') WHERE id = ?")
+        .bind(title)
+        .bind(content)
+        .bind(id)
+        .execute(pool.inner())
+        .await
+        .map_err(|e| e.to_string())?;
+
+    Ok(())
+}
+
+#[tauri::command]
+async fn delete_note(
+    pool: tauri::State<'_, SqlitePool>,
+    id: String,
+) -> Result<(), String> {
+    sqlx::query("DELETE FROM Note WHERE id = ?")
+        .bind(id)
+        .execute(pool.inner())
+        .await
+        .map_err(|e| e.to_string())?;
+
+    Ok(())
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -71,7 +106,7 @@ pub fn run() {
 
                 sqlx::query("CREATE TABLE IF NOT EXISTS Note (
                     id TEXT PRIMARY KEY, 
-                    titulo TEXT, 
+                    title TEXT, 
                     content TEXT, 
                     createdAt TEXT, 
                     updatedAt TEXT
@@ -84,7 +119,7 @@ pub fn run() {
             });
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![get_notes, create_note])
+        .invoke_handler(tauri::generate_handler![get_notes, create_note, update_note, delete_note])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

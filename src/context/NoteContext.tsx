@@ -1,0 +1,130 @@
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useTransition,
+  useRef,
+} from 'react';
+import { invoke } from '@tauri-apps/api/core';
+import { Block, NewNote, Note } from '../note/types';
+
+interface NoteContextType {
+  notes: Note[];
+  activeNote: Note | null;
+  setActiveNote: (note: Note | null) => void;
+  isPending: boolean;
+  saveNote: (note: NewNote) => Promise<void>;
+  deleteNote: (id: string) => Promise<void>;
+  loadNotes: () => Promise<void>;
+}
+
+const NoteContext = createContext<NoteContextType | undefined>(undefined);
+
+export function NoteProvider({ children }: { children: React.ReactNode }) {
+  const [notes, setNotes] = useState<Note[]>([]);
+  const [activeNote, setActiveNote] = useState<Note | null>(null);
+  const [isPending, startTransition] = useTransition();
+  const isInitialMount = useRef(true);
+
+  const loadNotes = async () => {
+    try {
+      const data = await invoke('get_notes');
+
+      const notes = (data as Note[]).map((note) => ({
+        ...note,
+        content: JSON.parse(note.content as unknown as string) as Block[],
+      }));
+
+      setNotes(notes);
+    } catch (error) {
+      console.error('Erro ao carregar notas:', error);
+    }
+  };
+
+  useEffect(() => {
+    loadNotes();
+  }, []);
+
+  useEffect(() => {
+    if (!activeNote || !activeNote.id) return;
+
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      startTransition(async () => {
+        try {
+          const contentString =
+            typeof activeNote.content === 'string'
+              ? activeNote.content
+              : JSON.stringify(activeNote.content);
+
+          await invoke('update_note', {
+            id: activeNote.id,
+            title: activeNote.title,
+            content: contentString,
+          });
+
+          await loadNotes();
+        } catch (error) {
+          console.error('Erro no auto-save:', error);
+        }
+      });
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [activeNote]);
+
+  const saveNote = async ({ title, content }: NewNote) => {
+    startTransition(async () => {
+      try {
+        await invoke('create_note', {
+          title,
+          content: JSON.stringify(content),
+        });
+        await loadNotes();
+      } catch (error) {
+        alert('Erro ao salvar no banco local');
+      }
+    });
+  };
+
+  // 4. Delete
+  const deleteNote = async (id: string) => {
+    startTransition(async () => {
+      try {
+        await invoke('delete_note', { id });
+        setNotes((prev) => prev.filter((n) => n.id !== id));
+        if (activeNote?.id === id) setActiveNote(null);
+      } catch (error) {
+        console.error(error);
+      }
+    });
+  };
+
+  return (
+    <NoteContext.Provider
+      value={{
+        activeNote,
+        setActiveNote,
+        isPending,
+        saveNote,
+        deleteNote,
+        notes,
+        loadNotes,
+      }}
+    >
+      {children}
+    </NoteContext.Provider>
+  );
+}
+
+export function useNotes() {
+  const context = useContext(NoteContext);
+  if (!context)
+    throw new Error('useNotes deve ser usado dentro de um NoteProvider');
+  return context;
+}
