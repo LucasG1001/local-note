@@ -1,77 +1,44 @@
 'use client';
 import React from 'react';
-import styles from './NoteBlock.module.css';
-import { useNotes } from '../context/NoteContext';
 import { Block } from './types';
 import { CodeBlock } from './CodeBlock';
+import { useNoteEditor } from '../hooks/useNoteEditor';
+import { useNoteShortcuts } from '../hooks/useNoteShortcuts';
 import AutoResizableTextarea from '../components/textarea/AutoResizableTextarea';
 
 interface NoteBlockProps {
   block: Block;
+  readOnly?: boolean; // Nova prop opcional
 }
 
-export default function NoteBlock({ block }: NoteBlockProps) {
-  const { setActiveNote, activeNote } = useNotes();
+export default function NoteBlock({ block, readOnly = false }: NoteBlockProps) {
+  const editor = useNoteEditor();
+  const shortcuts = useNoteShortcuts(block.id, editor);
 
-  if (!activeNote) return null;
-
-  const updateBlock = (id: string, updatedFields: Partial<Block>) => {
-    const newBlocks = activeNote.content.map((b) =>
-      b.id === id ? { ...b, ...updatedFields } : b,
-    );
-
-    setActiveNote({ ...activeNote, content: newBlocks });
-  };
-
-  const deleteBlock = (id: string) => {
-    const newBlocks = activeNote.content.filter((b) => b.id !== id);
-    setActiveNote({ ...activeNote, content: newBlocks });
-  };
-
-  const addBlock = () => {
-    const newBlock: Block = {
-      id: crypto.randomUUID(),
-      type: 'text',
-      value: '',
-    };
-    setActiveNote({
-      ...activeNote,
-      content: [...activeNote.content, newBlock],
-    });
-  };
-
-  const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (!event.shiftKey) return;
-
-    const actions: Record<string, () => void> = {
-      KeyT: () => updateBlock(block.id, { type: 'text' }),
-      KeyC: () =>
-        updateBlock(block.id, { type: 'code', language: 'javascript' }),
-      Enter: () => addBlock(),
-      Delete: () => deleteBlock(block.id),
-    };
-
-    const action = actions[event.code];
-    if (action) {
-      event.preventDefault();
-      action();
-    }
-  };
+  const handleKeyDown = readOnly ? undefined : shortcuts;
 
   const handleChange = (value: string) => {
-    updateBlock(block.id, { value: value });
+    if (readOnly) return;
+    editor.updateBlock(block.id, { value });
   };
 
   return (
-    <div className={styles.blockWrapper} onKeyDown={handleKeyDown}>
+    <div
+      onKeyDown={handleKeyDown}
+      className={`block-container ${readOnly ? 'read-only' : ''}`}
+    >
       {block.type === 'text' ? (
-        <AutoResizableTextarea value={block.value} onChange={handleChange} />
+        <AutoResizableTextarea
+          value={block.value}
+          onChange={handleChange}
+          readOnly={readOnly}
+        />
       ) : (
         <CodeBlock
           value={block.value}
           language={block.language || 'javascript'}
           onChange={handleChange}
-          editable={true}
+          editable={!readOnly}
         />
       )}
     </div>

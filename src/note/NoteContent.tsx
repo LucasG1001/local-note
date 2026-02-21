@@ -1,40 +1,38 @@
-import { useEffect } from 'react';
-import { useNotes } from '../context/NoteContext';
+import { useNoteEditor } from '../hooks/useNoteEditor';
 import styles from './NoteContent.module.css';
 import NoteBlock from './NoteBlock';
+import { Note } from './types';
 
-const NoteContent = () => {
-  const { activeNote, setActiveNote } = useNotes();
+interface NoteContentProps {
+  note?: Note; // Nota opcional para permitir modo leitura
+  readOnly?: boolean; // Nova prop opcional para modo leitura
+}
 
-  useEffect(() => {
-    if (activeNote && activeNote.content.length === 0) {
-      setActiveNote({
-        ...activeNote,
-        content: [
-          {
-            id: crypto.randomUUID(),
-            type: 'text',
-            language: 'javascript',
-            value: '',
-          },
-        ],
-      });
-    }
-  }, [activeNote, setActiveNote]);
+const NoteContent = ({ note, readOnly = false }: NoteContentProps) => {
+  const editor = useNoteEditor();
+  const displayNote = note || editor.activeNote;
 
-  if (!activeNote) {
-    return <div className={styles.empty}>Selecione uma nota</div>;
+  if (!displayNote) {
+    return (
+      <div className={styles.empty}>
+        <p>Selecione uma nota para começar a editar</p>
+      </div>
+    );
   }
 
   return (
     <div className={styles.container}>
-      <header className={styles.header}>
-        <h3 className={styles.sectionTitle}>INFORMAÇÃO SALVA</h3>
-      </header>
+      {!readOnly && (
+        <header className={styles.header}>
+          <h3 className={styles.sectionTitle}>
+            {displayNote.title || 'NOTA SEM TÍTULO'}
+          </h3>
+        </header>
+      )}
 
       <div className={styles.noteContent}>
-        {activeNote.content.map((block) => (
-          <NoteBlock key={block.id} block={block} />
+        {displayNote.content.map((block) => (
+          <NoteBlock key={block.id} block={block} readOnly={readOnly} />
         ))}
       </div>
     </div>

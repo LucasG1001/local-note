@@ -38,6 +38,8 @@
 .cardBody, .cardContent{
   background-color: #131314;
   border-radius: 0 0 10px 10px;
+  height: 150px;
+  overflow-y: scroll;
 
 }
 

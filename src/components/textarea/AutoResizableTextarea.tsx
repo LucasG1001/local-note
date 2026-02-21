@@ -5,12 +5,14 @@ interface AutoResizableTextareaProps {
   value: string;
   onChange: (value: string) => void;
   style?: React.CSSProperties;
+  readOnly?: boolean;
 }
 
 export default function AutoResizableTextarea({
   value,
   onChange,
   style,
+  readOnly = false,
 }: AutoResizableTextareaProps) {
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
 
@@ -27,6 +29,7 @@ export default function AutoResizableTextarea({
 
   return (
     <textarea
+      readOnly={readOnly}
       ref={textareaRef}
       value={value}
       onChange={(e) => {

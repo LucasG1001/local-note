@@ -6,6 +6,7 @@ import styles from './NoteManager.module.css';
 import { Note } from './types';
 import { NoteDetail } from './NoteDetail';
 import ConfirmationModal from '../components/modal/ConfirmationModal';
+import NoteContent from './NoteContent';
 // import { NoteDetail } from './NoteDetail';
 // import SearchBar from '../components/SearchBar/SearchBar';
 // import AutoResizableTextarea from '../components/AutoResizableTextarea/AutoResizableTextarea';
@@ -32,8 +33,6 @@ export default function NoteManager() {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [noteIdToDelete, setNoteToDelete] = useState<Note | null>(null);
-
-  console.log(notes);
 
   const handleDeleteClick = (e: React.MouseEvent, note: Note) => {
     e.stopPropagation();
@@ -84,28 +83,7 @@ export default function NoteManager() {
                 </button>
               </div>
               <div className={styles.cardBody}>
-                {/* <div className={styles.cardContent}>
-                  {item.content.map((block) => {
-                    return (
-                      <div key={block.id} className={styles.blockWrapper}>
-                        {block.type === 'text' ? (
-                          <AutoResizableTextarea
-                            value={block.value}
-                            onChange={() => {}}
-                          />
-                        ) : (
-                          <CodeBlock
-                            value={block.value}
-                            language={block.language || 'javascript'}
-                            onChange={() => {}}
-                            editable={false}
-                          />
-                        )}
-                      </div>
-                    );
-                  })}
-                </div> */}
-                {/* <Tags item={item} /> */}
+                <NoteContent note={item} readOnly />{' '}
               </div>
             </div>
           ))}

@@ -7,16 +7,7 @@ import NoteContent from './NoteContent';
 
 export const NoteDetail = () => {
   const { activeNote, setActiveNote } = useNotes();
-  const [tag, setTag] = useState('');
-
   if (!activeNote) return null;
-
-  // const handleKeyDown = (e: React.KeyboardEvent) => {
-  //   if (e.code === 'Space') {
-  //     setActiveNote({ ...activeNote, tags: [...activeNote.tags, tag] });
-  //     setTag('');
-  //   }
-  // };
 
   return (
     <div className={styles.overlay}>
