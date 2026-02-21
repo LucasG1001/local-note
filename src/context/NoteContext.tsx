@@ -30,7 +30,6 @@ export function NoteProvider({ children }: { children: React.ReactNode }) {
   const loadNotes = async () => {
     try {
       const data = await invoke('get_notes');
-
       const notes = (data as Note[]).map((note) => ({
         ...note,
         content: JSON.parse(note.content as unknown as string) as Block[],
@@ -66,6 +65,7 @@ export function NoteProvider({ children }: { children: React.ReactNode }) {
             id: activeNote.id,
             title: activeNote.title,
             content: contentString,
+            tags: activeNote.tags || [],
           });
 
           await loadNotes();
@@ -78,12 +78,15 @@ export function NoteProvider({ children }: { children: React.ReactNode }) {
     return () => clearTimeout(timer);
   }, [activeNote]);
 
-  const saveNote = async ({ title, content }: NewNote) => {
+  const saveNote = async ({ title, content, tags }: NewNote) => {
+    console.log(title, tags, content);
+
     startTransition(async () => {
       try {
         await invoke('create_note', {
           title,
           content: JSON.stringify(content),
+          tags,
         });
         await loadNotes();
       } catch (error) {
@@ -92,7 +95,6 @@ export function NoteProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
-  // 4. Delete
   const deleteNote = async (id: string) => {
     startTransition(async () => {
       try {

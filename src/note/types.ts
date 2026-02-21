@@ -4,6 +4,7 @@ interface Note {
   content: Block[];
   createdAt?: string;
   updatedAt?: string;
+  tags: string[];
 }
 
 interface Block {
@@ -16,6 +17,7 @@ interface Block {
 interface NewNote {
   title: string;
   content: Block[] | [];
+  tags: string[];
 }
 
 export type { Note, NewNote, Block };

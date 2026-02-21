@@ -7,6 +7,7 @@ import { Note } from './types';
 import { NoteDetail } from './NoteDetail';
 import ConfirmationModal from '../components/modal/ConfirmationModal';
 import NoteContent from './NoteContent';
+import SearchBar from '../components/SearchBar';
 // import { NoteDetail } from './NoteDetail';
 // import SearchBar from '../components/SearchBar/SearchBar';
 // import AutoResizableTextarea from '../components/AutoResizableTextarea/AutoResizableTextarea';
@@ -25,6 +26,7 @@ const emptyNote: Note = {
       value: '',
     },
   ],
+  tags: [],
 };
 
 export default function NoteManager() {
@@ -49,11 +51,11 @@ export default function NoteManager() {
   };
   return (
     <div className={styles.container}>
-      {/* <SearchBar
+      <SearchBar
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
         suggestions={[]}
-      /> */}
+      />
 
       <div className={styles.grid}>
         <button className={styles.addBtn} onClick={() => saveNote(emptyNote)}>

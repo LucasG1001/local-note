@@ -2,10 +2,11 @@ import { useNoteEditor } from '../hooks/useNoteEditor';
 import styles from './NoteContent.module.css';
 import NoteBlock from './NoteBlock';
 import { Note } from './types';
+import { Tags } from 'lucide-react';
 
 interface NoteContentProps {
-  note?: Note; // Nota opcional para permitir modo leitura
-  readOnly?: boolean; // Nova prop opcional para modo leitura
+  note?: Note;
+  readOnly?: boolean;
 }
 
 const NoteContent = ({ note, readOnly = false }: NoteContentProps) => {

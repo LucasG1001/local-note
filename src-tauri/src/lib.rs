@@ -15,15 +15,20 @@ pub struct Note {
     #[serde(rename = "updatedAt")]
     #[sqlx(rename = "updatedAt")]
     pub updated_at: DateTime<Utc>,
+    #[sqlx(json)]
+    pub tags: Vec<String>,
 }
 #[tauri::command]
 async fn get_notes(
     pool: tauri::State<'_, SqlitePool> 
 ) -> Result<Vec<Note>, String> {
-    let notes = sqlx::query_as::<_, Note>("SELECT * FROM Note ORDER BY createdAt DESC")
+    let notes = sqlx::query_as::<sqlx::Sqlite, Note>("SELECT * FROM Note ORDER BY createdAt DESC")
         .fetch_all(pool.inner())
         .await
-        .map_err(|e| e.to_string())?;
+        .map_err(|e| {
+            println!("Erro no banco: {}", e); // Log para te ajudar
+            e.to_string()
+        })?;
     
     Ok(notes)
 }
@@ -32,15 +37,17 @@ async fn get_notes(
 async fn create_note(
     pool: tauri::State<'_, SqlitePool>, 
     title: String, 
-    content: String
+    content: String,
+    tags: Vec<String>,
 ) -> Result<String, String> {
     let new_id = Uuid::new_v4().to_string();
     let now = Utc::now();
 
-    sqlx::query("INSERT INTO Note (id, title, content, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?)")
+    sqlx::query("INSERT INTO Note (id, title, content, tags, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?)")
         .bind(&new_id)
         .bind(title)
         .bind(content)
+        .bind(sqlx::types::Json(tags))
         .bind(now)
         .bind(now)
         .execute(pool.inner())
@@ -56,10 +63,12 @@ async fn update_note(
     id: String,
     title: String,
     content: String,
+    tags: Vec<String>,
 ) -> Result<(), String> {
-    sqlx::query("UPDATE Note SET title = ?, content = ?, updatedAt = datetime('now') WHERE id = ?")
+    sqlx::query("UPDATE Note SET title = ?, content = ?, tags = ?, updatedAt = datetime('now') WHERE id = ?")
         .bind(title)
         .bind(content)
+        .bind(sqlx::types::Json(tags))
         .bind(id)
         .execute(pool.inner())
         .await
@@ -108,6 +117,7 @@ pub fn run() {
                     id TEXT PRIMARY KEY, 
                     title TEXT, 
                     content TEXT, 
+                    tags TEXT,
                     createdAt TEXT, 
                     updatedAt TEXT
                 );")
