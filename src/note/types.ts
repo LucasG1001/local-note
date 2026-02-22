@@ -1,9 +1,20 @@
+interface BackendNote {
+  id: string;
+  title: string;
+  content: string;
+  rank: number;
+  createdAt: string;
+  updatedAt: string;
+  tags: string[];
+}
+
 interface Note {
-  id?: string;
+  id: string;
   title: string;
   content: Block[];
-  createdAt?: string;
-  updatedAt?: string;
+  rank: number;
+  createdAt: string;
+  updatedAt: string;
   tags: string[];
 }
 
@@ -17,7 +28,6 @@ interface Block {
 interface NewNote {
   title: string;
   content: Block[] | [];
-  tags: string[];
 }
 
-export type { Note, NewNote, Block };
+export type { Note, NewNote, Block, BackendNote };

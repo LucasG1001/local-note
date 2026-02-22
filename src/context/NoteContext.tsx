@@ -7,7 +7,7 @@ import React, {
   useRef,
 } from 'react';
 import { invoke } from '@tauri-apps/api/core';
-import { Block, NewNote, Note } from '../note/types';
+import { BackendNote, Block, NewNote, Note } from '../note/types';
 
 interface NoteContextType {
   notes: Note[];
@@ -29,13 +29,14 @@ export function NoteProvider({ children }: { children: React.ReactNode }) {
 
   const loadNotes = async () => {
     try {
-      const data = await invoke('get_notes');
-      const notes = (data as Note[]).map((note) => ({
+      const data = await invoke<BackendNote[]>('get_notes', { limit: 5 });
+
+      const processedNotes: Note[] = data.map((note) => ({
         ...note,
-        content: JSON.parse(note.content as unknown as string) as Block[],
+        content: JSON.parse(note.content) as Block[],
       }));
 
-      setNotes(notes);
+      setNotes(processedNotes);
     } catch (error) {
       console.error('Erro ao carregar notas:', error);
     }
@@ -78,15 +79,12 @@ export function NoteProvider({ children }: { children: React.ReactNode }) {
     return () => clearTimeout(timer);
   }, [activeNote]);
 
-  const saveNote = async ({ title, content, tags }: NewNote) => {
-    console.log(title, tags, content);
-
+  const saveNote = async ({ title, content }: NewNote) => {
     startTransition(async () => {
       try {
         await invoke('create_note', {
           title,
           content: JSON.stringify(content),
-          tags,
         });
         await loadNotes();
       } catch (error) {
