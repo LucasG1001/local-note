@@ -25,6 +25,16 @@
 
 .copyIcon{
   cursor: pointer;
+  background: red;
+  border-radius: 50%;
+  height: 30px;
+  width: 30px;
+  padding: 10px;
+}
+
+.copyIcon:hover {
+  color: #4A90E2;
+
 }
 
 .language {

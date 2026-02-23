@@ -1,5 +1,3 @@
-import React from 'react';
-import { Tag } from 'lucide-react';
 import styles from './Tags.module.css';
 
 const Tags = ({ tags }: { tags: string[] }) => {
@@ -7,11 +5,6 @@ const Tags = ({ tags }: { tags: string[] }) => {
 
   return (
     <div className={styles.container}>
-      <header className={styles.header}>
-        <Tag size={14} />
-        <span className={styles.title}>Tags</span>
-      </header>
-
       <div className={styles.tagsList}>
         {tags.map((tag) => (
           <span key={tag} className={styles.tag}>

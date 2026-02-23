@@ -3,11 +3,11 @@ import { useState, useMemo } from 'react';
 // import Tags from './Tags';
 import { useNotes } from '../context/NoteContext';
 import styles from './NoteManager.module.css';
-import { Note } from './types';
-import { NoteDetail } from './NoteDetail';
+import { NewNote, Note } from './types';
 import ConfirmationModal from '../components/modal/ConfirmationModal';
 import NoteContent from './NoteContent';
 import SearchBar from '../components/SearchBar';
+import { NoteDetail } from './NoteDetail';
 // import { NoteDetail } from './NoteDetail';
 // import SearchBar from '../components/SearchBar/SearchBar';
 // import AutoResizableTextarea from '../components/AutoResizableTextarea/AutoResizableTextarea';
@@ -15,8 +15,7 @@ import SearchBar from '../components/SearchBar';
 // import { NewNote, Note } from '../types/note';
 // import ConfirmationModal from '../components/modal/ConfirmationModal';
 
-const emptyNote: Note = {
-  id: '',
+const emptyNote: NewNote = {
   title: 'Nova nota',
   content: [
     {
@@ -70,12 +69,11 @@ export default function NoteManager() {
 
         {notes &&
           notes.map((item) => (
-            <div
-              onClick={() => setActiveNote(item)}
-              key={item.id}
-              className={styles.card}
-            >
-              <div className={styles.cardHeader}>
+            <div key={item.id} className={styles.card}>
+              <div
+                className={styles.cardHeader}
+                onClick={() => setActiveNote(item)}
+              >
                 <h3 className={styles.cardTitle}>{item.title}</h3>
                 <button
                   className={styles.deleteBtn}
@@ -85,7 +83,7 @@ export default function NoteManager() {
                 </button>
               </div>
               <div className={styles.cardBody}>
-                <NoteContent note={item} readOnly />{' '}
+                <NoteContent note={item} />{' '}
               </div>
             </div>
           ))}

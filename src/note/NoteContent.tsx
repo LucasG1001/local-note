@@ -2,7 +2,6 @@ import { useNoteEditor } from '../hooks/useNoteEditor';
 import styles from './NoteContent.module.css';
 import NoteBlock from './NoteBlock';
 import { Note } from './types';
-import { Tags } from 'lucide-react';
 
 interface NoteContentProps {
   note?: Note;
@@ -23,14 +22,6 @@ const NoteContent = ({ note, readOnly = false }: NoteContentProps) => {
 
   return (
     <div className={styles.container}>
-      {!readOnly && (
-        <header className={styles.header}>
-          <h3 className={styles.sectionTitle}>
-            {displayNote.title || 'NOTA SEM TÍTULO'}
-          </h3>
-        </header>
-      )}
-
       <div className={styles.noteContent}>
         {displayNote.content.map((block) => (
           <NoteBlock key={block.id} block={block} readOnly={readOnly} />

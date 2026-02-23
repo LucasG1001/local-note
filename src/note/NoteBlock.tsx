@@ -1,5 +1,4 @@
 'use client';
-import React from 'react';
 import { Block } from './types';
 import { CodeBlock } from './CodeBlock';
 import { useNoteEditor } from '../hooks/useNoteEditor';

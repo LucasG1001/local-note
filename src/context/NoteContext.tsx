@@ -57,6 +57,8 @@ export function NoteProvider({ children }: { children: React.ReactNode }) {
     const timer = setTimeout(() => {
       startTransition(async () => {
         try {
+          console.log(`Salvando ${activeNote}`);
+
           const contentString =
             typeof activeNote.content === 'string'
               ? activeNote.content
@@ -67,6 +69,7 @@ export function NoteProvider({ children }: { children: React.ReactNode }) {
             title: activeNote.title,
             content: contentString,
             tags: activeNote.tags || [],
+            rank: activeNote.rank || 0,
           });
 
           await loadNotes();

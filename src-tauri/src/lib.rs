@@ -6,7 +6,6 @@ use tauri::Manager;
 
 use sqlx::sqlite::{SqliteConnectOptions, SqlitePool};
 
-use chrono::{DateTime, Utc};
 
 #[derive(Serialize, Deserialize, sqlx::FromRow, Clone)]
 pub struct Note {
@@ -15,15 +14,14 @@ pub struct Note {
     pub content: String,
     pub rank: i32,
     #[serde(rename = "createdAt")]
-    #[sqlx(rename = "createdAt")] // <--- CRUCIAL: Mapeia o nome do banco para o Rust
+    #[sqlx(rename = "createdAt")]
     pub created_at: String,
     #[serde(rename = "updatedAt")]
-    #[sqlx(rename = "updatedAt")] // <--- CRUCIAL
+    #[sqlx(rename = "updatedAt")]
     pub updated_at: String,
     pub tags: Option<String>,
 }
 
-// Struct auxiliar para o frontend receber os dados limpos
 #[derive(Serialize, Deserialize, Clone)]
 pub struct NoteWithTags {
     pub id: String,
@@ -43,7 +41,10 @@ fn map_note(note: Note) -> NoteWithTags {
         rank: note.rank,
         created_at: note.created_at,
         updated_at: note.updated_at,
-        tags: if note.tags.is_empty() { vec![] } else { note.tags.split(',').map(|s| s.to_string()).collect() },
+        tags: note.tags
+            .filter(|t| !t.is_empty())
+            .map(|t| t.split(',').map(|s| s.trim().to_string()).collect())
+            .unwrap_or_default(),
     }
 }
 
@@ -73,6 +74,16 @@ async fn create_note(
 }
 
 #[tauri::command]
+async fn delete_note(pool: tauri::State<'_, SqlitePool>, id: String) -> Result<(), String> {
+    sqlx::query("DELETE FROM Note WHERE id = ?")
+        .bind(id)
+        .execute(pool.inner())
+        .await
+        .map_err(|e| e.to_string())?;
+    Ok(())
+}
+
+#[tauri::command]
 async fn get_notes(pool: tauri::State<'_, SqlitePool>, limit: i32) -> Result<Vec<NoteWithTags>, String> {
     let notes = sqlx::query_as::<_, Note>(
         "SELECT n.*, GROUP_CONCAT(t.name) as tags 
@@ -93,7 +104,6 @@ async fn get_notes(pool: tauri::State<'_, SqlitePool>, limit: i32) -> Result<Vec
 
 #[tauri::command]
 async fn get_notes_by_tags(pool: tauri::State<'_, SqlitePool>, search_tags: Vec<String>) -> Result<Vec<NoteWithTags>, String> {
-    // Busca notas que contenham PELO MENOS uma das tags enviadas
     let query = format!(
         "SELECT n.*, GROUP_CONCAT(t.name) as tags 
          FROM Note n 
@@ -133,7 +143,6 @@ async fn update_note(
 ) -> Result<(), String> {
     let mut tx = pool.begin().await.map_err(|e| e.to_string())?;
 
-    // 1. Update da nota (incluindo o rank passado pelo front)
     sqlx::query("UPDATE Note SET title = ?, content = ?, rank = ?, updatedAt = datetime('now') WHERE id = ?")
         .bind(title)
         .bind(content)
@@ -143,7 +152,6 @@ async fn update_note(
         .await
         .map_err(|e| e.to_string())?;
 
-    // 2. Gerenciar Tags (Remover relações antigas)
     sqlx::query("DELETE FROM NoteTag WHERE noteId = ?").bind(&id).execute(&mut *tx).await.map_err(|e| e.to_string())?;
 
 for tag_name in tags {
@@ -178,7 +186,6 @@ pub fn run() {
 
                 let pool = SqlitePool::connect_with(SqliteConnectOptions::new().filename(&db_path).create_if_missing(true)).await.unwrap();
 
-                // MIGRATIONS - Estrutura Relacional
                 sqlx::query("
                     CREATE TABLE IF NOT EXISTS Note (
                         id TEXT PRIMARY KEY, 
@@ -205,7 +212,7 @@ pub fn run() {
             });
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![ get_notes, get_notes_by_tags, get_all_tags, update_note, create_note])
+        .invoke_handler(tauri::generate_handler![ get_notes, get_notes_by_tags, get_all_tags, update_note, create_note, delete_note ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

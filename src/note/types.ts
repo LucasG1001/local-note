@@ -28,6 +28,7 @@ interface Block {
 interface NewNote {
   title: string;
   content: Block[] | [];
+  tags: string[];
 }
 
 export type { Note, NewNote, Block, BackendNote };
