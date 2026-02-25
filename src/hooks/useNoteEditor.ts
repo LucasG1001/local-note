@@ -24,6 +24,11 @@ export function useNoteEditor() {
     setActiveNote({ ...activeNote, content: newBlocks });
   };
 
+  const updateNote = (updatedFields: Partial<typeof activeNote>) => {
+    if (!activeNote) return;
+    setActiveNote({ ...activeNote, ...updatedFields });
+  };
+
   const deleteBlock = (id: string) => {
     if (!activeNote) return;
     const newBlocks = activeNote.content.filter((b) => b.id !== id);
@@ -43,5 +48,5 @@ export function useNoteEditor() {
     });
   };
 
-  return { blocks, activeNote, updateBlock, deleteBlock, addBlock };
+  return { blocks, activeNote, updateBlock, deleteBlock, addBlock, updateNote };
 }

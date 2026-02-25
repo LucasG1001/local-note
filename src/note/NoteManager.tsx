@@ -1,6 +1,5 @@
 'use client';
 import { useState } from 'react';
-// import Tags from './Tags';
 import { useNotes } from '../context/NoteContext';
 import styles from './NoteManager.module.css';
 import { NewNote, Note } from './types';
@@ -8,12 +7,6 @@ import ConfirmationModal from '../components/modal/ConfirmationModal';
 import NoteContent from './NoteContent';
 import SearchBar from '../components/SearchBar';
 import { NoteDetail } from './NoteDetail';
-// import { NoteDetail } from './NoteDetail';
-// import SearchBar from '../components/SearchBar/SearchBar';
-// import AutoResizableTextarea from '../components/AutoResizableTextarea/AutoResizableTextarea';
-// import { CodeBlock } from './CodeBlock';
-// import { NewNote, Note } from '../types/note';
-// import ConfirmationModal from '../components/modal/ConfirmationModal';
 
 const emptyNote: NewNote = {
   title: 'Nova nota',
@@ -74,6 +67,7 @@ export default function NoteManager() {
               <div
                 className={styles.cardHeader}
                 onClick={() => setActiveNote(item)}
+                style={{ cursor: 'pointer' }}
               >
                 <h3 className={styles.cardTitle}>{item.title}</h3>
                 <button

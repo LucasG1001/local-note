@@ -1,15 +1,16 @@
-.editor, .editor textarea{
-    
+.editor,
+.editor textarea {
   border-radius: 0 0 10px 10px;
   margin-top: 2px;
 }
 
-.editor, .editorHeader, .editor textarea{
-  background-color: #1E1F20;
+.editor,
+.editorHeader,
+.editor textarea {
+  background-color: #1e1f20;
   font-family: 'Roboto Mono', 'Fira Code', monospace !important;
   font-weight: 500;
-  line-height: 30px;
-
+  font-size: 14px !important;
 }
 
 .codeBlockHeader {
@@ -20,10 +21,10 @@
   padding: 15px;
   border-radius: 10px 10px 0 0;
   margin-bottom: 2px;
-  background-color: #1E1F20;
+  background-color: #1e1f20;
 }
 
-.copyIcon{
+.copyIcon {
   cursor: pointer;
   border-radius: 50%;
   height: 35px;
@@ -32,8 +33,7 @@
 }
 
 .copyIcon:hover {
-  background-color: #2A2B2C;
-
+  background-color: #2a2b2c;
 }
 
 .language {

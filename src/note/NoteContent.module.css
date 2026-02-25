@@ -1,4 +1,5 @@
-.noteInput, .noteEditor {
+.noteInput,
+.noteEditor {
   line-height: 1.25rem;
   margin-bottom: 1rem;
   padding: 0.5rem;
@@ -11,17 +12,19 @@
   font-size: 16px;
   color: #e3e3e3;
   font-weight: 400;
-
 }
 
 .container {
   display: flex;
   flex-direction: column;
   gap: 15px;
+  width: 900px;
 }
 
-.noteEditor, .noteHeader, .noteEditor textarea{
-  background-color: #1E1F20;
+.noteEditor,
+.noteHeader,
+.noteEditor textarea {
+  background-color: #1e1f20;
   padding: 15px !important;
 }
 .noteHeader {
@@ -29,11 +32,10 @@
   margin-bottom: 2px;
 }
 
-.noteEditor .noteEditor textarea{
+.noteEditor .noteEditor textarea {
   border-radius: 0 0 10px 10px;
   margin-top: 2px;
 }
-
 
 .sectionTitle {
   font-size: 0.75rem;
