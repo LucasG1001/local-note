@@ -1,5 +1,5 @@
 // Dentro do seu SearchBar.tsx (resumo da lógica)
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import styles from './SearchBar.module.css';
 
 interface SearchBarProps {
@@ -48,7 +48,7 @@ export default function SearchBar({
 
       {showSuggestions && filteredSuggestions.length > 0 && (
         <ul className={styles.suggestionList}>
-          {filteredSuggestions.map((tag, index) => (
+          {filteredSuggestions.map((tag) => (
             <li
               key={tag}
               onClick={() => handleSelectSuggestion(tag)}

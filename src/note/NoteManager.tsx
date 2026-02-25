@@ -1,5 +1,5 @@
 'use client';
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 // import Tags from './Tags';
 import { useNotes } from '../context/NoteContext';
 import styles from './NoteManager.module.css';
