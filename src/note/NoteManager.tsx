@@ -50,23 +50,24 @@ export default function NoteManager() {
   };
   return (
     <div className={styles.container}>
-      <SearchBar
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        suggestions={[]}
-      />
-
-      <div className={styles.grid}>
+      <div className={styles.header}>
+        <SearchBar
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          suggestions={[]}
+        />
         <button className={styles.addBtn} onClick={() => saveNote(emptyNote)}>
           Adicionar nota
         </button>
 
-        {notes.length == 0 && (
+        {/* {notes.length == 0 && (
           <div className={styles.emptyNoteWarning}>
             Nenhuma nota criada ainda
           </div>
-        )}
+        )} */}
+      </div>
 
+      <div className={styles.noteList}>
         {notes &&
           notes.map((item) => (
             <div key={item.id} className={styles.card}>

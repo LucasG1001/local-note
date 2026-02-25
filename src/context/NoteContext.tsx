@@ -29,7 +29,7 @@ export function NoteProvider({ children }: { children: React.ReactNode }) {
 
   const loadNotes = async () => {
     try {
-      const data = await invoke<BackendNote[]>('get_notes', { limit: 5 });
+      const data = await invoke<BackendNote[]>('get_notes', { limit: 100 });
 
       const processedNotes: Note[] = data.map((note) => ({
         ...note,

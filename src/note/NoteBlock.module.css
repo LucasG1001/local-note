@@ -25,15 +25,14 @@
 
 .copyIcon{
   cursor: pointer;
-  background: red;
   border-radius: 50%;
-  height: 30px;
-  width: 30px;
-  padding: 10px;
+  height: 35px;
+  width: 35px;
+  padding: 8px;
 }
 
 .copyIcon:hover {
-  color: #4A90E2;
+  background-color: #2A2B2C;
 
 }
 
