@@ -17,6 +17,7 @@ interface NoteContextType {
   saveNote: (note: NewNote) => Promise<void>;
   deleteNote: (id: string) => Promise<void>;
   loadNotes: () => Promise<void>;
+  getTags: () => Promise<string[]>;
 }
 
 const NoteContext = createContext<NoteContextType | undefined>(undefined);
@@ -82,6 +83,16 @@ export function NoteProvider({ children }: { children: React.ReactNode }) {
     return () => clearTimeout(timer);
   }, [activeNote]);
 
+  const getTags = async () => {
+    try {
+      const tags = await invoke<string[]>('get_all_tags');
+      return tags;
+    } catch (error) {
+      alert('Erro ao carregar tags');
+      return [];
+    }
+  };
+
   const saveNote = async ({ title, content }: NewNote) => {
     startTransition(async () => {
       try {
@@ -118,6 +129,7 @@ export function NoteProvider({ children }: { children: React.ReactNode }) {
         deleteNote,
         notes,
         loadNotes,
+        getTags,
       }}
     >
       {children}

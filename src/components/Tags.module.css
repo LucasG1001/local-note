@@ -41,7 +41,7 @@
   position: absolute;
   top: -4px;
   left: -4px;
-  color: #ef4444; /* red-500 */
+  color: #ef4444;
   cursor: pointer;
   display: none;
 }
@@ -53,10 +53,9 @@
 .tagInput {
   font-size: 12px;
   background-color: transparent;
-  color: #60a5fa; /* blue-400 */
-  width: 150px;
+  color: #60a5fa;
 }
 
 .tagInput::placeholder {
-  color: #9ca3af; /* text-gray-400 */
+  color: #9ca3af;
 }

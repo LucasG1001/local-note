@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNotes } from '../context/NoteContext';
 import styles from './NoteManager.module.css';
 import { NewNote, Note } from './types';
@@ -22,11 +22,14 @@ const emptyNote: NewNote = {
 };
 
 export default function NoteManager() {
-  const { notes, saveNote, deleteNote, activeNote, setActiveNote } = useNotes();
+  const { notes, saveNote, deleteNote, activeNote, setActiveNote, getTags } =
+    useNotes();
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [noteIdToDelete, setNoteToDelete] = useState<Note | null>(null);
+  const [tags, setTags] = useState<string[]>([]);
 
   const handleDeleteClick = (e: React.MouseEvent, note: Note) => {
     e.stopPropagation();
@@ -41,23 +44,25 @@ export default function NoteManager() {
       setNoteToDelete(null);
     }
   };
+
+  useEffect(() => {
+    getTags().then((tags) => {
+      setTags(tags);
+    });
+  }, []);
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
         <SearchBar
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
-          suggestions={[]}
+          suggestions={tags}
+          setSelectedTags={setSelectedTags}
         />
         <button className={styles.addBtn} onClick={() => saveNote(emptyNote)}>
           Adicionar nota
         </button>
-
-        {/* {notes.length == 0 && (
-          <div className={styles.emptyNoteWarning}>
-            Nenhuma nota criada ainda
-          </div>
-        )} */}
       </div>
 
       <div className={styles.noteList}>
