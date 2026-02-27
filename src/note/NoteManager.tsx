@@ -84,8 +84,10 @@ export default function NoteManager() {
                   DELETE
                 </button>
               </div>
-              <div className={styles.cardBody}>
-                <NoteContent note={item} />{" "}
+              <div className={styles.cardContent}>
+                <div className={styles.cardBody}>
+                  <NoteContent note={item} />{" "}
+                </div>
               </div>
             </div>
           ))}

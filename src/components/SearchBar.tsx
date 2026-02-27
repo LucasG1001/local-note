@@ -18,7 +18,7 @@ export default function SearchBar({
 }: SearchBarProps) {
   const [value, setValue] = useState("");
   const lastWord = value.split(" ").pop() || "";
-  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [, setShowSuggestions] = useState(false);
   const [matchedCount, setMatchedCount] = useState(0);
   const matchedTags = useTermMatcher(value, suggestions);
   const filtredSuggestions = suggestions.filter(

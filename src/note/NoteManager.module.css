@@ -6,7 +6,7 @@
   box-sizing: border-box;
   color: #f3f4f6;
   background-color: var(--bg-main);
-  width: 900px;
+  width: 1100px;
   margin: 0 auto;
 }
 
@@ -19,7 +19,6 @@
 
 .noteList {
   flex: 1;
-  overflow-y: auto;
   gap: 10px;
   display: flex;
   flex-direction: column;
@@ -43,16 +42,19 @@
   border-radius: 10px 10px 0 0;
 }
 
-.cardBody,
 .cardContent {
   background-color: #131314;
   border-radius: 0 0 10px 10px;
-  max-height: 200px;
 }
 
 .cardBody {
-  padding: 10px;
-  overflow: hidden;
+  overflow-y: scroll;
+  display: flex;
+  justify-content: center;
+  max-height: 200px;
+  width: fit-content;
+  margin: 5px auto;
+
 }
 
 .deleteBtn {
