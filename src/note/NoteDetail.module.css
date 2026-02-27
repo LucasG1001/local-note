@@ -6,6 +6,8 @@
   align-items: top;
   justify-content: center;
   padding: 1rem;
+  background: red;
+  height: 100vh;
 }
 
 .backdrop {
@@ -30,4 +32,8 @@
 .body {
   padding: 1.5rem;
   padding: 20px 80px;
+  height: 85%;
+  overflow-y: scroll;
+  display: flex;
+  justify-content: center;
 }

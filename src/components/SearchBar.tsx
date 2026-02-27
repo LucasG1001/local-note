@@ -42,8 +42,6 @@ export default function SearchBar({
     onClose: () => setShowSuggestions(false),
   });
 
-  console.log(matchedTags);
-
   const handleSelect = (tag: string) => {
     const words = value.split(" ");
     setValue(words.slice(0, words.length - 1).join(" ") + " " + tag);
