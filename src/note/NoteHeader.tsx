@@ -1,13 +1,10 @@
-import React, { useState } from 'react';
-import styles from './NoteHeader.module.css';
-import { useNotes } from '../context/NoteContext';
-import Tags from '../components/Tags';
-import { Terminal, X } from 'lucide-react';
+import styles from "./NoteHeader.module.css";
+import { useNotes } from "../context/NoteContext";
+import Tags from "../components/Tags";
+import { Terminal, X } from "lucide-react";
 
 const NoteHeader = () => {
   const { activeNote, setActiveNote } = useNotes();
-  const [tag, setTag] = useState('');
-
   if (!activeNote) return null;
 
   return (
@@ -33,7 +30,7 @@ const NoteHeader = () => {
         <X size={20} />
       </button>
       <div className={styles.tagsContainer}>
-        <Tags tags={activeNote.tags} />
+        <Tags tags={activeNote.tags} editable />
       </div>
     </div>
   );

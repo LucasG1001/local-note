@@ -1,35 +1,41 @@
-'use client';
-import { useEffect, useState } from 'react';
-import { useNotes } from '../context/NoteContext';
-import styles from './NoteManager.module.css';
-import { NewNote, Note } from './types';
-import ConfirmationModal from '../components/modal/ConfirmationModal';
-import NoteContent from './NoteContent';
-import SearchBar from '../components/SearchBar';
-import { NoteDetail } from './NoteDetail';
+"use client";
+import { useState } from "react";
+import { useNotes } from "../context/NoteContext";
+import styles from "./NoteManager.module.css";
+import { NewNote, Note } from "./types";
+import ConfirmationModal from "../components/modal/ConfirmationModal";
+import NoteContent from "./NoteContent";
+import SearchBar from "../components/SearchBar";
+import { NoteDetail } from "./NoteDetail";
+import Tags from "../components/Tags";
 
 const emptyNote: NewNote = {
-  title: 'Nova nota',
+  title: "Nova nota",
   content: [
     {
       id: crypto.randomUUID(),
-      type: 'text',
-      language: 'javascript',
-      value: '',
+      type: "text",
+      language: "javascript",
+      value: "",
     },
   ],
   tags: [],
 };
 
 export default function NoteManager() {
-  const { notes, saveNote, deleteNote, activeNote, setActiveNote, getTags } =
-    useNotes();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const {
+    notes,
+    saveNote,
+    deleteNote,
+    activeNote,
+    setActiveNote,
+    setSelectedTags,
+    tags,
+  } = useNotes();
+  const [searchTerm, setSearchTerm] = useState("");
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [noteIdToDelete, setNoteToDelete] = useState<Note | null>(null);
-  const [tags, setTags] = useState<string[]>([]);
 
   const handleDeleteClick = (e: React.MouseEvent, note: Note) => {
     e.stopPropagation();
@@ -44,13 +50,6 @@ export default function NoteManager() {
       setNoteToDelete(null);
     }
   };
-
-  useEffect(() => {
-    getTags().then((tags) => {
-      setTags(tags);
-    });
-  }, []);
-
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -72,9 +71,12 @@ export default function NoteManager() {
               <div
                 className={styles.cardHeader}
                 onClick={() => setActiveNote(item)}
-                style={{ cursor: 'pointer' }}
+                style={{ cursor: "pointer" }}
               >
-                <h3 className={styles.cardTitle}>{item.title}</h3>
+                <div>
+                  <h3 className={styles.cardTitle}>{item.title}</h3>
+                  <Tags tags={item.tags} editable={false} />
+                </div>
                 <button
                   className={styles.deleteBtn}
                   onClick={(e) => handleDeleteClick(e, item)}
@@ -83,7 +85,7 @@ export default function NoteManager() {
                 </button>
               </div>
               <div className={styles.cardBody}>
-                <NoteContent note={item} />{' '}
+                <NoteContent note={item} />{" "}
               </div>
             </div>
           ))}

@@ -1,11 +1,10 @@
-import { useMemo } from 'react';
+import { useMemo } from "react";
 
 interface MatchOptions {
   separator?: RegExp | string;
   caseSensitive?: boolean;
 }
 
-// 1. Defina os padrões fora do hook para manter a mesma referência de memória
 const DEFAULT_SEPARATOR = /\s+/;
 
 export function useTermMatcher(
@@ -13,11 +12,10 @@ export function useTermMatcher(
   referenceList: string[],
   options: MatchOptions = {},
 ) {
-  // 2. Use os padrões estáticos
   const { separator = DEFAULT_SEPARATOR, caseSensitive = false } = options;
 
   return useMemo(() => {
-    if (!input) return []; // Otimização: se não há input, retorna vazio
+    if (!input) return [];
 
     const terms = input
       .split(separator)
@@ -33,7 +31,5 @@ export function useTermMatcher(
     );
 
     return Array.from(new Set(matches));
-
-    // O referenceList também precisa ser estável no componente pai!
   }, [input, referenceList, separator, caseSensitive]);
 }

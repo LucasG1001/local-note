@@ -1,11 +1,10 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use uuid::Uuid;
 
 use tauri::Manager;
 
 use sqlx::sqlite::{SqliteConnectOptions, SqlitePool};
-
 
 #[derive(Serialize, Deserialize, sqlx::FromRow, Clone)]
 pub struct Note {
@@ -41,7 +40,8 @@ fn map_note(note: Note) -> NoteWithTags {
         rank: note.rank,
         created_at: note.created_at,
         updated_at: note.updated_at,
-        tags: note.tags
+        tags: note
+            .tags
             .filter(|t| !t.is_empty())
             .map(|t| t.split(',').map(|s| s.trim().to_string()).collect())
             .unwrap_or_default(),
@@ -50,15 +50,15 @@ fn map_note(note: Note) -> NoteWithTags {
 
 #[tauri::command]
 async fn create_note(
-    pool: tauri::State<'_, SqlitePool>, 
-    title: String, 
-    content: String
+    pool: tauri::State<'_, SqlitePool>,
+    title: String,
+    content: String,
 ) -> Result<String, String> {
     let new_id = Uuid::new_v4().to_string();
-    
+
     sqlx::query(
         "INSERT INTO Note (id, title, content, rank, createdAt, updatedAt) 
-         VALUES (?, ?, ?, 0, datetime('now'), datetime('now'))"
+         VALUES (?, ?, ?, 0, datetime('now'), datetime('now'))",
     )
     .bind(&new_id)
     .bind(title)
@@ -84,7 +84,10 @@ async fn delete_note(pool: tauri::State<'_, SqlitePool>, id: String) -> Result<(
 }
 
 #[tauri::command]
-async fn get_notes(pool: tauri::State<'_, SqlitePool>, limit: i32) -> Result<Vec<NoteWithTags>, String> {
+async fn get_notes(
+    pool: tauri::State<'_, SqlitePool>,
+    limit: i32,
+) -> Result<Vec<NoteWithTags>, String> {
     let notes = sqlx::query_as::<_, Note>(
         "SELECT n.*, GROUP_CONCAT(t.name) as tags 
          FROM Note n 
@@ -92,7 +95,7 @@ async fn get_notes(pool: tauri::State<'_, SqlitePool>, limit: i32) -> Result<Vec
          LEFT JOIN Tag t ON nt.tagId = t.id 
          GROUP BY n.id 
          ORDER BY n.rank DESC 
-         LIMIT ?"
+         LIMIT ?",
     )
     .bind(limit)
     .fetch_all(pool.inner())
@@ -103,23 +106,40 @@ async fn get_notes(pool: tauri::State<'_, SqlitePool>, limit: i32) -> Result<Vec
 }
 
 #[tauri::command]
-async fn get_notes_by_tags(pool: tauri::State<'_, SqlitePool>, search_tags: Vec<String>) -> Result<Vec<NoteWithTags>, String> {
+async fn get_notes_by_tags(
+    pool: tauri::State<'_, SqlitePool>,
+    search_tags: Vec<String>,
+) -> Result<Vec<NoteWithTags>, String> {
     let query = format!(
         "SELECT n.*, GROUP_CONCAT(t.name) as tags 
          FROM Note n 
          JOIN NoteTag nt ON n.id = nt.noteId 
          JOIN Tag t ON nt.tagId = t.id 
-         WHERE t.name IN ({}) 
+         WHERE n.id IN (
+             SELECT nt2.noteId 
+             FROM NoteTag nt2 
+             JOIN Tag t2 ON nt2.tagId = t2.id 
+             WHERE t2.name IN ({})
+         ) 
          GROUP BY n.id",
-        search_tags.iter().map(|_| "?").collect::<Vec<_>>().join(",")
+        search_tags
+            .iter()
+            .map(|_| "?")
+            .collect::<Vec<_>>()
+            .join(",")
     );
 
-    let mut sql = sqlx::query_as::<_, Note>(&query);
+    let mut sql_query = sqlx::query_as::<_, Note>(&query);
+
     for tag in search_tags {
-        sql = sql.bind(tag);
+        sql_query = sql_query.bind(tag);
     }
 
-    let notes = sql.fetch_all(pool.inner()).await.map_err(|e| e.to_string())?;
+    let notes = sql_query
+        .fetch_all(pool.inner())
+        .await
+        .map_err(|e| e.to_string())?;
+
     Ok(notes.into_iter().map(map_note).collect())
 }
 
@@ -152,24 +172,28 @@ async fn update_note(
         .await
         .map_err(|e| e.to_string())?;
 
-    sqlx::query("DELETE FROM NoteTag WHERE noteId = ?").bind(&id).execute(&mut *tx).await.map_err(|e| e.to_string())?;
-
-for tag_name in tags {
-    let normalized_tag = tag_name.to_lowercase().trim().to_string();
-    
-    sqlx::query("INSERT OR IGNORE INTO Tag (name) VALUES (?)")
-        .bind(&normalized_tag)
-        .execute(&mut *tx)
-        .await
-        .map_err(|e| e.to_string())?;
-    
-    sqlx::query("INSERT INTO NoteTag (noteId, tagId) SELECT ?, id FROM Tag WHERE name = ?")
+    sqlx::query("DELETE FROM NoteTag WHERE noteId = ?")
         .bind(&id)
-        .bind(&normalized_tag)
         .execute(&mut *tx)
         .await
         .map_err(|e| e.to_string())?;
-}
+
+    for tag_name in tags {
+        let normalized_tag = tag_name.to_lowercase().trim().to_string();
+
+        sqlx::query("INSERT OR IGNORE INTO Tag (name) VALUES (?)")
+            .bind(&normalized_tag)
+            .execute(&mut *tx)
+            .await
+            .map_err(|e| e.to_string())?;
+
+        sqlx::query("INSERT INTO NoteTag (noteId, tagId) SELECT ?, id FROM Tag WHERE name = ?")
+            .bind(&id)
+            .bind(&normalized_tag)
+            .execute(&mut *tx)
+            .await
+            .map_err(|e| e.to_string())?;
+    }
 
     tx.commit().await.map_err(|e| e.to_string())?;
     Ok(())
@@ -184,9 +208,16 @@ pub fn run() {
                 std::fs::create_dir_all(&app_dir).unwrap();
                 let db_path = app_dir.join("notes_v2.db");
 
-                let pool = SqlitePool::connect_with(SqliteConnectOptions::new().filename(&db_path).create_if_missing(true)).await.unwrap();
+                let pool = SqlitePool::connect_with(
+                    SqliteConnectOptions::new()
+                        .filename(&db_path)
+                        .create_if_missing(true),
+                )
+                .await
+                .unwrap();
 
-                sqlx::query("
+                sqlx::query(
+                    "
                     CREATE TABLE IF NOT EXISTS Note (
                         id TEXT PRIMARY KEY, 
                         title TEXT, 
@@ -206,13 +237,24 @@ pub fn run() {
                         FOREIGN KEY(tagId) REFERENCES Tag(id) ON DELETE CASCADE,
                         PRIMARY KEY (noteId, tagId)
                     );
-                ").execute(&pool).await.unwrap();
+                ",
+                )
+                .execute(&pool)
+                .await
+                .unwrap();
 
                 app_handle.manage(pool);
             });
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![ get_notes, get_notes_by_tags, get_all_tags, update_note, create_note, delete_note ])
+        .invoke_handler(tauri::generate_handler![
+            get_notes,
+            get_notes_by_tags,
+            get_all_tags,
+            update_note,
+            create_note,
+            delete_note
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

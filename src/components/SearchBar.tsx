@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
-import { useArrowNavigation } from '../hooks/useArrowNavigation';
-import { useClickOutside } from '../hooks/useClickOutside';
-import styles from './SearchBar.module.css';
-import { useTermMatcher } from '../hooks/useTermMatcher';
-import { Dropdown } from './Dropdown';
+import { useEffect, useRef, useState } from "react";
+import { useArrowNavigation } from "../hooks/useArrowNavigation";
+import { useClickOutside } from "../hooks/useClickOutside";
+import styles from "./SearchBar.module.css";
+import { useTermMatcher } from "../hooks/useTermMatcher";
+import { Dropdown } from "./Dropdown";
 
 interface SearchBarProps {
   searchTerm: string;
@@ -13,62 +13,55 @@ interface SearchBarProps {
 }
 
 export default function SearchBar({
-  searchTerm,
-  setSearchTerm,
   suggestions,
   setSelectedTags,
 }: SearchBarProps) {
+  const [value, setValue] = useState("");
+  const lastWord = value.split(" ").pop() || "";
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const wrapperRef = useRef<HTMLDivElement>(null);
-  const matchedTags = useTermMatcher(searchTerm, suggestions);
-
-  useEffect(() => {
-    if (matchedTags.length > 0) {
-      setSelectedTags(matchedTags);
-    }
-  }, [matchedTags, setSelectedTags]);
-
-  // 2. Filtro de Sugestões
-  const words = searchTerm.split(/\s+/);
-  const lastWord = words[words.length - 1].toLowerCase();
-  const filtered = suggestions.filter(
-    (s) => s.toLowerCase().startsWith(lastWord) && lastWord.length > 1,
+  const [matchedCount, setMatchedCount] = useState(0);
+  const matchedTags = useTermMatcher(value, suggestions);
+  const filtredSuggestions = suggestions.filter(
+    (suggestion) =>
+      suggestion.startsWith(lastWord.toLowerCase()) &&
+      !matchedTags.includes(suggestion),
   );
 
+  useEffect(() => {
+    const currentMatchedCount = matchedTags.length;
+
+    if (currentMatchedCount !== matchedCount) {
+      setSelectedTags(matchedTags);
+      setMatchedCount(currentMatchedCount);
+    }
+  }, [matchedTags]);
+
   const { activeIndex, handleKeyDown } = useArrowNavigation({
-    itemsCount: filtered.length,
-    onSelect: (index) => handleSelect(filtered[index]),
+    itemsCount: filtredSuggestions.length,
+    onSelect: (index) => handleSelect(filtredSuggestions[index]),
     onClose: () => setShowSuggestions(false),
-    resetDependency: searchTerm,
   });
 
-  // 4. Clique Fora
-  useClickOutside(wrapperRef, () => setShowSuggestions(false));
+  console.log(matchedTags);
 
   const handleSelect = (tag: string) => {
-    const newWords = [...words];
-    newWords[newWords.length - 1] = tag;
-    setSearchTerm(newWords.join(' ') + ' ');
-    setShowSuggestions(false);
+    const words = value.split(" ");
+    setValue(words.slice(0, words.length - 1).join(" ") + " " + tag);
   };
 
   return (
-    <div className={styles.searchWrapper} ref={wrapperRef}>
+    <div className={styles.searchWrapper} /*ref={wrapperRef}*/>
       <input
         className={styles.searchInput}
-        value={searchTerm}
+        value={value}
         onKeyDown={handleKeyDown}
-        onChange={(e) => {
-          setSearchTerm(e.target.value);
-          setShowSuggestions(true);
-        }}
-        onFocus={() => setShowSuggestions(true)}
+        onChange={(e) => setValue(e.target.value)}
         placeholder="Busque por tags..."
       />
 
-      {showSuggestions && filtered.length > 0 && (
+      {lastWord.length > 1 && (
         <Dropdown
-          items={filtered}
+          items={filtredSuggestions}
           activeIndex={activeIndex}
           onSelect={handleSelect}
         />
