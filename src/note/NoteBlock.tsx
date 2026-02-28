@@ -7,7 +7,7 @@ import AutoResizableTextarea from '../components/textarea/AutoResizableTextarea'
 
 interface NoteBlockProps {
   block: Block;
-  readOnly?: boolean; // Nova prop opcional
+  readOnly?: boolean;
 }
 
 export default function NoteBlock({ block, readOnly = false }: NoteBlockProps) {
@@ -35,9 +35,13 @@ export default function NoteBlock({ block, readOnly = false }: NoteBlockProps) {
       ) : (
         <CodeBlock
           value={block.value}
-          language={block.language || 'javascript'}
+          defaultLanguage={block.language || 'javascript'}
           onChange={handleChange}
           editable={!readOnly}
+          language={block.language || 'javascript'}
+          setLanguage={(lang) =>
+            editor.updateBlock(block.id, { language: lang })
+          }
         />
       )}
     </div>
