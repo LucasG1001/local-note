@@ -1,9 +1,8 @@
-import { useEffect, useRef, useState } from "react";
-import { useArrowNavigation } from "../hooks/useArrowNavigation";
-import { useClickOutside } from "../hooks/useClickOutside";
-import styles from "./SearchBar.module.css";
-import { useTermMatcher } from "../hooks/useTermMatcher";
-import { Dropdown } from "./Dropdown";
+import { useEffect, useState } from 'react';
+import { useArrowNavigation } from '../hooks/useArrowNavigation';
+import styles from './SearchBar.module.css';
+import { useTermMatcher } from '../hooks/useTermMatcher';
+import { Dropdown } from './Dropdown';
 
 interface SearchBarProps {
   searchTerm: string;
@@ -16,8 +15,8 @@ export default function SearchBar({
   suggestions,
   setSelectedTags,
 }: SearchBarProps) {
-  const [value, setValue] = useState("");
-  const lastWord = value.split(" ").pop() || "";
+  const [value, setValue] = useState('');
+  const lastWord = value.split(' ').pop() || '';
   const [, setShowSuggestions] = useState(false);
   const [matchedCount, setMatchedCount] = useState(0);
   const matchedTags = useTermMatcher(value, suggestions);
@@ -43,8 +42,8 @@ export default function SearchBar({
   });
 
   const handleSelect = (tag: string) => {
-    const words = value.split(" ");
-    setValue(words.slice(0, words.length - 1).join(" ") + " " + tag);
+    const words = value.split(' ');
+    setValue(words.slice(0, words.length - 1).join(' ') + ' ' + tag);
   };
 
   return (

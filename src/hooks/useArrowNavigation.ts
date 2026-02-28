@@ -1,4 +1,4 @@
-import { useState, useEffect, KeyboardEvent } from "react";
+import { useState, KeyboardEvent } from 'react';
 
 interface NavigationProps {
   itemsCount: number;
@@ -16,22 +16,22 @@ export function useArrowNavigation({
     if (itemsCount === 0) return;
 
     switch (e.key) {
-      case "ArrowDown":
+      case 'ArrowDown':
         e.preventDefault();
         setActiveIndex((prev) => (prev < itemsCount - 1 ? prev + 1 : prev));
         break;
-      case "ArrowUp":
+      case 'ArrowUp':
         e.preventDefault();
         setActiveIndex((prev) => (prev > 0 ? prev - 1 : 0));
         break;
-      case "Enter":
-      case "Tab":
+      case 'Enter':
+      case 'Tab':
         if (activeIndex >= 0) {
           e.preventDefault();
           onSelect(activeIndex);
         }
         break;
-      case "Escape":
+      case 'Escape':
         onClose();
         break;
       default:
