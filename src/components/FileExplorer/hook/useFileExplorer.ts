@@ -50,6 +50,53 @@ const useFileExplorer = ({ initialState }: UseFileExplorerProps) => {
     });
   };
 
+  // Dentro de useFileExplorer.ts, logo abaixo da função addItem:
+
+  const moveItem = (draggedId: string, targetFolderId: string | null) => {
+    // 1. Prevenções básicas
+    if (draggedId === targetFolderId) return; // Não pode soltar nele mesmo
+
+    setFileSystem((prev) => {
+      const nodes = { ...prev.nodes };
+      const rootIds = [...prev.rootIds];
+      const draggedNode = nodes[draggedId];
+
+      // Se o nó arrastado não existe, ou se o alvo não é uma pasta, cancela
+      if (!draggedNode) return prev;
+      if (targetFolderId && nodes[targetFolderId].type !== 'folder')
+        return prev;
+
+      // 2. Remover o ID do nó da sua localização antiga
+      if (draggedNode.parentId) {
+        const oldParent = nodes[draggedNode.parentId];
+        nodes[draggedNode.parentId] = {
+          ...oldParent,
+          childrenIds: oldParent.childrenIds.filter((id) => id !== draggedId),
+        };
+      } else {
+        const index = rootIds.indexOf(draggedId);
+        if (index > -1) rootIds.splice(index, 1);
+      }
+
+      // 3. Adicionar o ID do nó na nova localização (targetFolderId)
+      if (targetFolderId) {
+        const newParent = nodes[targetFolderId];
+        nodes[targetFolderId] = {
+          ...newParent,
+          childrenIds: [...newParent.childrenIds, draggedId],
+        };
+        // Atualiza o parentId do item arrastado
+        nodes[draggedId] = { ...draggedNode, parentId: targetFolderId };
+      } else {
+        // Se targetFolderId for null, jogou na raiz
+        rootIds.push(draggedId);
+        nodes[draggedId] = { ...draggedNode, parentId: null };
+      }
+
+      return { nodes, rootIds };
+    });
+  };
+
   return {
     collapseKey,
     handleCollapseAll,
@@ -60,6 +107,7 @@ const useFileExplorer = ({ initialState }: UseFileExplorerProps) => {
     addItem,
     folderId,
     setFolderId,
+    moveItem, // Adicionamos a função de mover itens ao retorno do hook
   };
 };
 

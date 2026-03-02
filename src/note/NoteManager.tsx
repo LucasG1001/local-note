@@ -8,7 +8,6 @@ import NoteContent from './NoteContent';
 import SearchBar from '../components/SearchBar';
 import { NoteDetail } from './NoteDetail';
 import Tags from '../components/Tags';
-import FileExplorer from '../components/FileExplorer/FileExplorer';
 
 const emptyNote: NewNote = {
   title: 'Nova nota',
@@ -65,16 +64,14 @@ export default function NoteManager() {
         </button>
       </div>
 
-      <FileExplorer />
-
-      {/* <div className={styles.noteList}>
+      <div className={styles.noteList}>
         {notes &&
           notes.map((item) => (
             <div key={item.id} className={styles.card}>
               <div
                 className={styles.cardHeader}
                 onClick={() => setActiveNote(item)}
-                style={{ cursor: "pointer" }}
+                style={{ cursor: 'pointer' }}
               >
                 <div>
                   <h3 className={styles.cardTitle}>{item.title}</h3>
@@ -89,12 +86,12 @@ export default function NoteManager() {
               </div>
               <div className={styles.cardContent}>
                 <div className={styles.cardBody}>
-                  <NoteContent note={item} />{" "}
+                  <NoteContent note={item} />{' '}
                 </div>
               </div>
             </div>
           ))}
-      </div> */}
+      </div>
 
       <ConfirmationModal
         isOpen={isModalOpen}
