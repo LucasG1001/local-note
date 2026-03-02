@@ -1,0 +1,67 @@
+/* FileExplorer.module.css */
+.container {
+  width: 300px;
+  height: 100vh;
+  background-color: #1e1e1e;
+  color: #cccccc;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 13px;
+  user-select: none;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  text-transform: uppercase;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+.actions button {
+  background: none;
+  border: none;
+  color: #858585;
+  cursor: pointer;
+  padding: 2px 5px;
+  margin-left: 2px;
+}
+
+.actions button:hover {
+  background-color: #37373d;
+  color: #fff;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  padding: 3px 5px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.item:hover {
+  background-color: #2a2d2e;
+}
+
+.arrow {
+  font-size: 8px;
+  margin-right: 6px;
+  transition: transform 0.1s;
+}
+
+.arrowDown {
+  transform: rotate(90deg);
+}
+
+.folderIcon,
+.fileIcon {
+  margin-right: 6px;
+  font-size: 14px;
+}
+
+.children {
+  margin-left: 10px;
+  border-left: 1px solid #404040; /* Linha guia opcional */
+}

@@ -1,22 +1,23 @@
-"use client";
-import { useState } from "react";
-import { useNotes } from "../context/NoteContext";
-import styles from "./NoteManager.module.css";
-import { NewNote, Note } from "./types";
-import ConfirmationModal from "../components/modal/ConfirmationModal";
-import NoteContent from "./NoteContent";
-import SearchBar from "../components/SearchBar";
-import { NoteDetail } from "./NoteDetail";
-import Tags from "../components/Tags";
+'use client';
+import { useState } from 'react';
+import { useNotes } from '../context/NoteContext';
+import styles from './NoteManager.module.css';
+import { NewNote, Note } from './types';
+import ConfirmationModal from '../components/modal/ConfirmationModal';
+import NoteContent from './NoteContent';
+import SearchBar from '../components/SearchBar';
+import { NoteDetail } from './NoteDetail';
+import Tags from '../components/Tags';
+import FileExplorer from '../components/FileExplorer/FileExplorer';
 
 const emptyNote: NewNote = {
-  title: "Nova nota",
+  title: 'Nova nota',
   content: [
     {
       id: crypto.randomUUID(),
-      type: "text",
-      language: "javascript",
-      value: "",
+      type: 'text',
+      language: 'javascript',
+      value: '',
     },
   ],
   tags: [],
@@ -32,7 +33,7 @@ export default function NoteManager() {
     setSelectedTags,
     tags,
   } = useNotes();
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [noteIdToDelete, setNoteToDelete] = useState<Note | null>(null);
@@ -64,7 +65,9 @@ export default function NoteManager() {
         </button>
       </div>
 
-      <div className={styles.noteList}>
+      <FileExplorer />
+
+      {/* <div className={styles.noteList}>
         {notes &&
           notes.map((item) => (
             <div key={item.id} className={styles.card}>
@@ -91,7 +94,7 @@ export default function NoteManager() {
               </div>
             </div>
           ))}
-      </div>
+      </div> */}
 
       <ConfirmationModal
         isOpen={isModalOpen}
