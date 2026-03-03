@@ -15,7 +15,6 @@ const FileExplorer = () => {
   } = useFileExplorer({ initialState: normalizedMockData });
 
   useEffect(() => {
-    // Essa função força o navegador a permitir o drop em QUALQUER lugar da tela
     const allowDrag = (e: Event) => {
       e.preventDefault();
     };

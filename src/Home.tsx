@@ -1,8 +1,13 @@
+import { DraggableBox } from './components/DraggableBox';
 import FileExplorer from './components/FileExplorer/FileExplorer';
-import NoteManager from './note/NoteManager';
 
 const Home = () => {
-  return <FileExplorer />;
+  return (
+    <>
+      <DraggableBox />
+      <FileExplorer />
+    </>
+  );
 };
 
 export default Home;

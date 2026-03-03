@@ -71,6 +71,7 @@
   padding: 4px;
   border-radius: 4px;
   transition: background-color 0.2s;
+  -webkit-app-region: no-drag;
 }
 
 .item:hover {
