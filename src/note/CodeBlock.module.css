@@ -1,3 +1,7 @@
+.codeBlock {
+  color: #ccc;
+  margin-top: 20px;
+}
 .editor,
 .editor textarea {
   border-radius: 0 0 10px 10px;
@@ -10,8 +14,7 @@
   background-color: #1e1f20;
   font-family: 'Roboto Mono', 'Fira Code', monospace !important;
   font-weight: 600;
-  font-size: 16px !important;
-  color: #ccc;
+  font-size: 14px !important;
 }
 
 .codeBlockHeader {

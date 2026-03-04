@@ -1,56 +1,70 @@
-.noteInput,
-.noteEditor {
-  line-height: 1.25rem;
+/* NoteContent.module.css */
+.noteContainer {
+  --gemini-bg: #0e0e0e;
+  --gemini-text-main: #e3e3e3;
+  --gemini-code-bg: #131314;
+
+  padding: 40px;
+  max-width: 850px;
+  margin: 0 auto;
+  color: var(--gemini-text-main);
+  font-family: 'Inter', sans-serif;
+  line-height: 1.6;
+}
+
+.blockH1 {
+  font-size: 2.2rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-top: 2rem;
   margin-bottom: 1rem;
-  padding: 0.5rem;
-  border-radius: 0.25rem;
-  border: none;
-  color: inherit;
-  width: 100%;
-  outline: none;
-  line-height: 1.6rem;
-  font-size: 16px;
-  color: #e3e3e3;
-  font-weight: 400;
+  letter-spacing: -0.02em;
 }
 
-.container {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  width: 900px;
+.blockP {
+  font-size: 1.1rem;
+  margin-bottom: 1.2rem;
+  color: var(--gemini-text-main);
 }
 
-.noteEditor,
-.noteHeader,
-.noteEditor textarea {
-  background-color: #1e1f20;
-  padding: 15px !important;
-}
-.noteHeader {
-  border-radius: 10px 10px 0 0;
-  margin-bottom: 2px;
+.blockList {
+  font-size: 1.1rem;
+  margin-left: 1.5rem;
+  margin-bottom: 1rem;
 }
 
-.noteEditor .noteEditor textarea {
-  border-radius: 0 0 10px 10px;
-  margin-top: 2px;
+.blockCode {
+  background-color: var(--gemini-code-bg);
+  border: 1px solid #2d2d2d;
+  border-radius: 12px;
+  padding: 20px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem;
+  overflow-x: auto;
+  margin: 24px 0;
+  color: #d1d1d1;
 }
 
-.sectionTitle {
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: #6b7280;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin: 0;
+/* Estilo para quando o arquivo está vazio */
+.emptyState {
+  color: #555;
+  font-style: italic;
+  text-align: center;
+  margin-top: 50px;
 }
 
-.noteContent {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+.noteContainer [contentEditable] {
+  outline: none; /* Remove aquela borda azul padrão do navegador */
+  transition: border 0.2s;
+  min-height: 1.2em; /* Garante que blocos vazios sejam clicáveis */
+}
+
+/* Mostra uma bordinha sutil quando o usuário está editando o bloco */
+.noteContainer [contentEditable]:focus {
+  border-left: 2px solid var(--gemini-accent);
+}
+
+.blockCODE {
+  white-space: pre-wrap; /* Mantém espaços e quebras no código */
+  word-break: break-all;
 }

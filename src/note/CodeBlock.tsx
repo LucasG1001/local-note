@@ -1,9 +1,9 @@
 import Editor from 'react-simple-code-editor';
 import { ChevronUp, Copy } from 'lucide-react';
 import { highlightCode, copyToClipboard } from '../services/highlightService';
-import styles from './NoteBlock.module.css';
 import { Dropdown } from '../components/Dropdown';
 import React from 'react';
+import styles from './CodeBlock.module.css';
 
 interface Props {
   value: string;
