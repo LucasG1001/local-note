@@ -1,19 +1,15 @@
 import React from 'react';
-import { NormalizedFileNode } from '../components/FileExplorer/types';
+import {
+  NormalizedFileNode,
+  EditorBlock,
+} from '../components/FileExplorer/types';
 import styles from './NoteContent.module.css';
-
-interface EditorBlock {
-  id: string;
-  type: 'h1' | 'p' | 'list-item' | 'code';
-  content: string;
-}
 
 interface NoteContentProps {
   note: NormalizedFileNode;
 }
 
 const NoteContent = ({ note }: NoteContentProps) => {
-  // Estado local para os blocos (para edição fluida)
   const [blocks, setBlocks] = React.useState<EditorBlock[]>(() => {
     try {
       return typeof note.content === 'string'
@@ -24,53 +20,76 @@ const NoteContent = ({ note }: NoteContentProps) => {
     }
   });
 
-  const updateBlock = (id: string, newContent: string) => {
+  const updateBlock = React.useCallback((id: string, newContent: string) => {
     setBlocks((prev) =>
       prev.map((b) => (b.id === id ? { ...b, content: newContent } : b)),
     );
-  };
+  }, []);
 
-  const handleKeyDown = (e: React.KeyboardEvent, index: number) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      // Lógica para criar novo bloco abaixo
-      const newBlock: EditorBlock = {
-        id: crypto.randomUUID(),
-        type: 'p',
-        content: '',
-      };
-      const updated = [...blocks];
-      updated.splice(index + 1, 0, newBlock);
-      setBlocks(updated);
-
-      // O próximo passo seria dar focus() no novo elemento
-    }
-  };
+  const handleKeyDown = React.useCallback(
+    (e: React.KeyboardEvent, index: number) => {
+      if (e.shiftKey && e.key === 'Enter') {
+        e.preventDefault();
+        const newBlock: EditorBlock = {
+          id: crypto.randomUUID(),
+          type: 'p',
+          content: '',
+        };
+        setBlocks((currentBlocks) => {
+          const updated = [...currentBlocks];
+          updated.splice(index + 1, 0, newBlock);
+          return updated;
+        });
+      }
+    },
+    [],
+  );
 
   return (
     <main className={styles.noteContainer}>
-      {blocks.map((block, index) => {
-        // Renderização dinâmica baseada no tipo
-        const Tag = block.type === 'list-item' ? 'li' : block.type;
-
-        return (
-          <Tag
-            key={block.id}
-            contentEditable
-            suppressContentEditableWarning // Evita aviso do React por ter filhos e ser editável
-            className={
-              styles[`block${block.type.toUpperCase()}`] || styles.blockP
-            }
-            onInput={(e) =>
-              updateBlock(block.id, e.currentTarget.textContent || '')
-            }
-            onKeyDown={(e) => handleKeyDown(e, index)}
-          >
-            {block.content}
-          </Tag>
-        );
-      })}
+      {blocks.map((block, index) => (
+        <EditableBlock
+          key={block.id}
+          block={block}
+          index={index}
+          updateBlock={updateBlock}
+          handleKeyDown={handleKeyDown}
+        />
+      ))}
     </main>
+  );
+};
+
+const EditableBlock = ({
+  block,
+  index,
+  updateBlock,
+  handleKeyDown,
+}: {
+  block: EditorBlock;
+  index: number;
+  updateBlock: (id: string, content: string) => void;
+  handleKeyDown: (e: React.KeyboardEvent, index: number) => void;
+}) => {
+  const ref = React.useRef<HTMLElement>(null);
+
+  React.useEffect(() => {
+    if (ref.current && ref.current.innerHTML !== block.content) {
+      ref.current.innerHTML = block.content;
+    }
+  }, [block]);
+
+  const Tag = block.type === 'list-item' ? 'li' : block.type;
+
+  return (
+    <Tag
+      ref={ref}
+      contentEditable
+      suppressContentEditableWarning
+      className={styles[`block${block.type.toUpperCase()}`] || styles.blockP}
+      onInput={(e) => updateBlock(block.id, e.currentTarget.innerHTML)}
+      onKeyDown={(e) => handleKeyDown(e, index)}
+    />
   );
 };
 
