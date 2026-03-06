@@ -12,15 +12,17 @@ const NoteContent = ({ note }: NoteContentProps) => {
 
   return (
     <main className={styles.noteContainer}>
-      {blocks.map((block, index) => (
-        <EditableBlock
-          key={block.id}
-          block={block}
-          index={index}
-          updateBlock={updateBlock}
-          handleKeyDown={handleKeyDown}
-        />
-      ))}
+      <div className={styles.blocks}>
+        {blocks.map((block, index) => (
+          <EditableBlock
+            key={block.id}
+            block={block}
+            index={index}
+            updateBlock={updateBlock}
+            handleKeyDown={handleKeyDown}
+          />
+        ))}
+      </div>
     </main>
   );
 };
