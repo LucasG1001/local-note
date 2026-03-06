@@ -3,13 +3,13 @@
   --gemini-bg: #0e0e0e;
   --gemini-text-main: #e3e3e3;
   --gemini-code-bg: #131314;
-
   padding: 40px;
-  max-width: 850px;
   margin: 0 auto;
   color: var(--gemini-text-main);
-  font-family: 'Inter', sans-serif;
+  font-family: 'Roboto', sans-serif;
   line-height: 1.6;
+  background: #000000;
+  width: 100%;
 }
 
 .blockH1 {
@@ -22,13 +22,13 @@
 }
 
 .blockP {
-  font-size: 1.1rem;
+  font-size: 1rem;
   margin-bottom: 1.2rem;
   color: var(--gemini-text-main);
 }
 
-.blockList {
-  font-size: 1.1rem;
+.blockLi {
+  font-size: 1rem;
   margin-left: 1.5rem;
   margin-bottom: 1rem;
 }
@@ -57,11 +57,6 @@
   outline: none; /* Remove aquela borda azul padrão do navegador */
   transition: border 0.2s;
   min-height: 1.2em; /* Garante que blocos vazios sejam clicáveis */
-}
-
-/* Mostra uma bordinha sutil quando o usuário está editando o bloco */
-.noteContainer [contentEditable]:focus {
-  border-left: 2px solid var(--gemini-accent);
 }
 
 .blockCODE {

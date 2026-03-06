@@ -2,7 +2,7 @@
 
 export interface EditorBlock {
   id: string;
-  type: 'h1' | 'p' | 'list-item' | 'image' | 'code';
+  type: 'h1' | 'p' | 'li' | 'image' | 'code';
   content: string;
 }
 
@@ -101,8 +101,8 @@ export const normalizedMockData: FileExplorerState = {
           type: 'p',
           content: 'Um padrão poderoso para criar componentes flexíveis.',
         },
-        { id: 'b7', type: 'list-item', content: 'Melhora a legibilidade' },
-        { id: 'b8', type: 'list-item', content: 'Facilita a manutenção' },
+        { id: 'b7', type: 'li', content: 'Melhora a legibilidade' },
+        { id: 'b8', type: 'li', content: 'Facilita a manutenção' },
       ],
       childrenIds: [],
     },
