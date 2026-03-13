@@ -1,0 +1,41 @@
+/* Editor.module.css */
+.container {
+    width: 100%;
+    margin: 20px 0;
+}
+
+/* Usando :global(.classe) individualmente ou em bloco de forma compatível */
+.container :global(.ql-toolbar.ql-snow) {
+    border: 1px solid #e2e8f0;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    background-color: #f8fafc;
+    padding: 10px;
+}
+
+.container :global(.ql-container.ql-snow) {
+    border: 1px solid #e2e8f0;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+    font-family: 'Inter', sans-serif;
+    font-size: 17px;
+}
+
+.container :global(.ql-container.ql-snow.ql-code-block-container) {
+    min-height: 400px;
+    font-weight: 500;
+    line-height: 1.6;
+    color: #334155;
+}
+
+.container :global(.ql-code-block-container) {
+    font-family: 'Fira Code', 'Courier New', monospace !important;
+    font-size: 15px !important;
+    color: #abb2bf !important;
+    padding: 20px !important;
+    border-radius: 8px;
+    margin: 15px 0;
+    line-height: 1.5;
+    display: block;
+    white-space: pre;
+}

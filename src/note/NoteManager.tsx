@@ -2,30 +2,16 @@
 import { useState } from "react";
 import { useNotes } from "../context/NoteContext";
 import styles from "./NoteManager.module.css";
-import { NewNote, Note } from "./types";
+import { Note } from "./types";
 import ConfirmationModal from "../components/modal/ConfirmationModal";
 import NoteContent from "./NoteContent";
 import SearchBar from "../components/SearchBar";
 import { NoteDetail } from "./NoteDetail";
 import Tags from "../components/Tags";
 
-const emptyNote: NewNote = {
-  title: "Nova nota",
-  content: [
-    {
-      id: crypto.randomUUID(),
-      type: "text",
-      language: "javascript",
-      value: "",
-    },
-  ],
-  tags: [],
-};
-
 export default function NoteManager() {
   const {
     notes,
-    saveNote,
     deleteNote,
     activeNote,
     setActiveNote,
@@ -50,29 +36,29 @@ export default function NoteManager() {
       setNoteToDelete(null);
     }
   };
+
+  // If there's an active note, we show the full-page note details.
+  if (activeNote) {
+    return <NoteDetail />;
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
+        <h1 className={styles.pageTitle}>Todas as Notas</h1>
         <SearchBar
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
           suggestions={tags}
           setSelectedTags={setSelectedTags}
         />
-        <button className={styles.addBtn} onClick={() => saveNote(emptyNote)}>
-          Adicionar nota
-        </button>
       </div>
 
       <div className={styles.noteList}>
         {notes &&
           notes.map((item) => (
-            <div key={item.id} className={styles.card}>
-              <div
-                className={styles.cardHeader}
-                onClick={() => setActiveNote(item)}
-                style={{ cursor: "pointer" }}
-              >
+            <div key={item.id} className={styles.card} onClick={() => setActiveNote(item)}>
+              <div className={styles.cardHeader}>
                 <div>
                   <h3 className={styles.cardTitle}>{item.title}</h3>
                   <Tags tags={item.tags} editable={false} />
@@ -81,16 +67,28 @@ export default function NoteManager() {
                   className={styles.deleteBtn}
                   onClick={(e) => handleDeleteClick(e, item)}
                 >
-                  DELETE
+                  Excluir
                 </button>
               </div>
               <div className={styles.cardContent}>
                 <div className={styles.cardBody}>
-                  <NoteContent note={item} />{" "}
+                  {/* Read-only preview */}
+                  <div className={styles.preview}>
+                    {item.content.length > 0 && item.content[0].type === 'text'
+                      ? item.content[0].value
+                      : (item.content.length > 0 ? "Código..." : "Nota vazia...")}
+                  </div>
                 </div>
               </div>
             </div>
           ))}
+
+        {notes.length === 0 && (
+          <div className={styles.emptyState}>
+            <p>Nenhuma nota encontrada.</p>
+            <p className={styles.emptySub}>Crie uma nova nota na barra lateral.</p>
+          </div>
+        )}
       </div>
 
       <ConfirmationModal
@@ -100,8 +98,6 @@ export default function NoteManager() {
         title={` Deletar nota "${noteIdToDelete?.title}" `}
         message="Tem certeza que deseja excluir esta nota? Esta ação não pode ser desfeita."
       />
-
-      {activeNote && <NoteDetail />}
     </div>
   );
 }

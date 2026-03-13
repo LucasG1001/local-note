@@ -1,39 +1,24 @@
-.overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 50;
+.pageContainer {
   display: flex;
-  align-items: top;
-  justify-content: center;
-  padding: 1rem;
-  background: red;
-  height: 100vh;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  background: var(--bg-main);
+  overflow-y: auto;
 }
 
-.backdrop {
-  position: absolute;
-  inset: 0;
-  background-color: #2C2D2D;
-  backdrop-filter: blur(10px);
-  transition: opacity 0.2s;
-  cursor: pointer;
+.contentWrapper {
+  display: flex;
+  flex-direction: column;
+  max-width: 900px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 60px 80px;
 }
-
-.modal {
-  position: relative;
-  border: 1px solid #333;
-  width: 80%;
-  border-radius: 0.5rem;
-  background: #131314;
-  margin-bottom: 15px;
-}
-
 
 .body {
-  padding: 1.5rem;
-  padding: 20px 80px;
-  height: 85%;
-  overflow-y: scroll;
+  padding-top: 20px;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  flex: 1;
 }

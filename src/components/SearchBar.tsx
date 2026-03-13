@@ -56,6 +56,7 @@ export default function SearchBar({
         placeholder="Busque por tags..."
       />
 
+
       {lastWord.length > 1 && (
         <Dropdown
           items={filtredSuggestions}

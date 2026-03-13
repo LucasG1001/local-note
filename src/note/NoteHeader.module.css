@@ -1,73 +1,65 @@
 .header {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 10px;
-  padding: 1.5rem;
-  background-color: #131314;
-  border-bottom: 1px solid #333;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-bottom: 24px;
+  background-color: transparent;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 24px;
+  position: relative;
 }
 
 .headerInfo {
   display: flex;
-  align-items: top;
-  gap: 0.75rem;
+  align-items: center;
+  gap: 12px;
   width: 100%;
 }
 
 .iconContainer {
-  padding: 0.5rem;
-  background-color: rgba(59, 130, 246, 0.1);
-  border-radius: 0.5rem;
-  color: #60a5fa;
+  display: flex;
+  color: var(--text-muted);
 }
 
 .title {
-  font-size: 1.25rem;
+  font-size: 40px;
   font-weight: 700;
-  color: white;
-  line-height: 1.25;
+  color: var(--text-main);
+  line-height: 1.2;
   margin: 0;
   display: block;
   width: 100%;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: inherit;
+}
+
+.title::placeholder {
+  color: #dbdbdb;
 }
 
 .closeButton {
-  padding: 0.5rem;
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 8px;
   background: transparent;
   border: none;
-  border-radius: 9999px;
-  transition: all 0.2s;
-  color: #9ca3af;
+  border-radius: 4px;
+  color: var(--text-muted);
   cursor: pointer;
   display: flex;
+  transition: background-color 0.2s;
 }
 
 .closeButton:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: white;
-}
-
-.copyButton:active {
-  transform: scale(0.95);
-}
-
-.copyButtonDefault {
-  background-color: #2563eb;
-  color: white;
-}
-
-.copyButtonDefault:hover {
-  background-color: #3b82f6;
-}
-
-.copyButtonSuccess {
-  background-color: #16a34a;
-  color: white;
+  background-color: var(--bg-hover);
+  color: var(--text-main);
 }
 
 .tagsContainer {
   display: flex;
   align-items: center;
+  margin-top: 8px;
 }
