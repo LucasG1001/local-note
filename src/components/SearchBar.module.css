@@ -1,84 +1,53 @@
-:root {
-  --bg-surface: #1a1a1b;
-  --accent-color: #3b82f6;
-  --text-main: #ffffff;
-  --text-muted: #a1a1aa;
-  --border-color: rgba(255, 255, 255, 0.1);
-  --shadow-lg:
-    0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
-}
-
 .searchWrapper {
   width: 100%;
   position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 14px;
+  color: var(--text-muted);
+  pointer-events: none;
+  flex-shrink: 0;
 }
 
 .searchInput {
   width: 100%;
-  padding: 1rem 1.5rem;
-  padding-right: 3.5rem;
+  padding: 0.75rem 2.5rem;
   background-color: var(--bg-surface);
   border: 1px solid var(--border-color);
-  border-radius: 12px;
+  border-radius: 10px;
   color: var(--text-main);
-  font-size: 1rem;
+  font-size: 0.925rem;
   outline: none;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: var(--shadow-lg);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .searchInput:focus {
-  border-color: var(--accent-color);
-  box-shadow:
-    0 0 0 3px rgba(59, 130, 246, 0.2),
-    var(--shadow-lg);
+  border-color: #818cf8;
+  box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.15);
 }
 
-.suggestionList {
-  position: absolute;
-  top: calc(100% + 8px);
-  left: 0;
-  right: 0;
-  background-color: var(--bg-surface);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 0.5rem;
-  box-shadow: var(--shadow-lg);
-  z-index: 50;
-  max-height: 300px;
-  overflow-y: auto;
-
-  backdrop-filter: blur(8px);
-  background-color: rgba(26, 26, 27, 0.95);
-}
-
-.suggestionList::-webkit-scrollbar {
-  width: 6px;
-}
-.suggestionList::-webkit-scrollbar-thumb {
-  background: var(--border-color);
-  border-radius: 10px;
-}
-
-.suggestionItem {
-  display: flex;
-  align-items: center;
-  padding: 0.75rem 1rem;
-  cursor: pointer;
-  border-radius: 8px;
+.searchInput::placeholder {
   color: var(--text-muted);
-  transition: all 0.15s ease;
-  list-style: none;
+  opacity: 0.7;
 }
 
-.suggestionItem:hover,
-.suggestionItem.active {
-  background-color: rgba(255, 255, 255, 0.05);
+.clearBtn {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 18px;
+  line-height: 1;
+  padding: 0 4px;
+  transition: color 0.2s;
+}
+
+.clearBtn:hover {
   color: var(--text-main);
-  padding-left: 1.25rem;
-}
-
-.suggestionItem strong {
-  color: var(--accent-color);
-  font-weight: 600;
 }

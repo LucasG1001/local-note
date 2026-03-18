@@ -1,68 +1,50 @@
-import { useEffect, useState } from 'react';
-import { useArrowNavigation } from '../hooks/useArrowNavigation';
+import { useEffect, useRef, useState } from 'react';
 import styles from './SearchBar.module.css';
-import { useTermMatcher } from '../hooks/useTermMatcher';
-import { Dropdown } from './Dropdown';
+import { Search } from 'lucide-react';
 
 interface SearchBarProps {
-  searchTerm: string;
-  setSearchTerm: (val: string) => void;
-  suggestions: string[];
-  setSelectedTags: (tags: string[]) => void;
+  onSearch: (query: string) => void;
+  onClear: () => void;
 }
 
-export default function SearchBar({
-  suggestions,
-  setSelectedTags,
-}: SearchBarProps) {
+export default function SearchBar({ onSearch, onClear }: SearchBarProps) {
   const [value, setValue] = useState('');
-  const lastWord = value.split(' ').pop() || '';
-  const [, setShowSuggestions] = useState(false);
-  const [matchedCount, setMatchedCount] = useState(0);
-  const matchedTags = useTermMatcher(value, suggestions);
-  const filtredSuggestions = suggestions.filter(
-    (suggestion) =>
-      suggestion.startsWith(lastWord.toLowerCase()) &&
-      !matchedTags.includes(suggestion),
-  );
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    const currentMatchedCount = matchedTags.length;
+    if (debounceRef.current) clearTimeout(debounceRef.current);
 
-    if (currentMatchedCount !== matchedCount) {
-      setSelectedTags(matchedTags);
-      setMatchedCount(currentMatchedCount);
+    if (value.trim() === '') {
+      onClear();
+      return;
     }
-  }, [matchedTags]);
 
-  const { activeIndex, handleKeyDown } = useArrowNavigation({
-    itemsCount: filtredSuggestions.length,
-    onSelect: (index) => handleSelect(filtredSuggestions[index]),
-    onClose: () => setShowSuggestions(false),
-  });
+    debounceRef.current = setTimeout(() => {
+      onSearch(value.trim());
+    }, 500);
 
-  const handleSelect = (tag: string) => {
-    const words = value.split(' ');
-    setValue(words.slice(0, words.length - 1).join(' ') + ' ' + tag);
-  };
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [value]);
 
   return (
-    <div className={styles.searchWrapper} /*ref={wrapperRef}*/>
+    <div className={styles.searchWrapper}>
+      <Search size={16} className={styles.searchIcon} />
       <input
         className={styles.searchInput}
         value={value}
-        onKeyDown={handleKeyDown}
         onChange={(e) => setValue(e.target.value)}
-        placeholder="Busque por tags..."
+        placeholder="Busca semântica..."
       />
-
-
-      {lastWord.length > 1 && (
-        <Dropdown
-          items={filtredSuggestions}
-          activeIndex={activeIndex}
-          onSelect={handleSelect}
-        />
+      {value && (
+        <button
+          className={styles.clearBtn}
+          onClick={() => setValue('')}
+          title="Limpar busca"
+        >
+          ×
+        </button>
       )}
     </div>
   );

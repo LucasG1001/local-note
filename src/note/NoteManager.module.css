@@ -76,6 +76,7 @@
   line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 3;
+  line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -118,4 +119,35 @@
   font-size: 14px !important;
   margin-top: 8px;
   font-weight: 400 !important;
+}
+
+.loadingBanner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #818cf8;
+  margin-bottom: 16px;
+  padding: 8px 12px;
+  background-color: rgba(129, 140, 248, 0.08);
+  border-radius: 6px;
+  border: 1px solid rgba(129, 140, 248, 0.2);
+  width: fit-content;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.dateLabel {
+  margin-top: auto;
+  padding-top: 10px;
+  font-size: 12px;
+  color: var(--text-muted);
+  opacity: 0.6;
 }

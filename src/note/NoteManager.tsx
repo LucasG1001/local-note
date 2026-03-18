@@ -1,13 +1,11 @@
-"use client";
 import { useState } from "react";
 import { useNotes } from "../context/NoteContext";
 import styles from "./NoteManager.module.css";
 import { Note } from "./types";
 import ConfirmationModal from "../components/modal/ConfirmationModal";
-import NoteContent from "./NoteContent";
 import SearchBar from "../components/SearchBar";
 import { NoteDetail } from "./NoteDetail";
-import Tags from "../components/Tags";
+import { Loader2 } from "lucide-react";
 
 export default function NoteManager() {
   const {
@@ -15,13 +13,13 @@ export default function NoteManager() {
     deleteNote,
     activeNote,
     setActiveNote,
-    setSelectedTags,
-    tags,
+    searchNotes,
+    loadNotes,
+    isPending,
   } = useNotes();
-  const [searchTerm, setSearchTerm] = useState("");
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [noteIdToDelete, setNoteToDelete] = useState<Note | null>(null);
+  const [noteToDelete, setNoteToDelete] = useState<Note | null>(null);
 
   const handleDeleteClick = (e: React.MouseEvent, note: Note) => {
     e.stopPropagation();
@@ -30,58 +28,70 @@ export default function NoteManager() {
   };
 
   const handleConfirmDelete = () => {
-    if (noteIdToDelete?.id) {
-      deleteNote(noteIdToDelete.id);
+    if (noteToDelete?.id) {
+      deleteNote(noteToDelete.id);
       setIsModalOpen(false);
       setNoteToDelete(null);
     }
   };
 
-  // If there's an active note, we show the full-page note details.
   if (activeNote) {
     return <NoteDetail />;
   }
 
+  const formatDate = (iso: string) => {
+    const d = new Date(iso);
+    return d.toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" });
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h1 className={styles.pageTitle}>Todas as Notas</h1>
+        <h1 className={styles.pageTitle}>Notas</h1>
         <SearchBar
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          suggestions={tags}
-          setSelectedTags={setSelectedTags}
+          onSearch={searchNotes}
+          onClear={loadNotes}
         />
       </div>
 
+      {isPending && (
+        <div className={styles.loadingBanner}>
+          <Loader2 size={14} className={styles.spinner} />
+          <span>Indexando com IA...</span>
+        </div>
+      )}
+
       <div className={styles.noteList}>
-        {notes &&
-          notes.map((item) => (
-            <div key={item.id} className={styles.card} onClick={() => setActiveNote(item)}>
-              <div className={styles.cardHeader}>
-                <div>
-                  <h3 className={styles.cardTitle}>{item.title}</h3>
-                  <Tags tags={item.tags} editable={false} />
-                </div>
-                <button
-                  className={styles.deleteBtn}
-                  onClick={(e) => handleDeleteClick(e, item)}
-                >
-                  Excluir
-                </button>
-              </div>
-              <div className={styles.cardContent}>
-                <div className={styles.cardBody}>
-                  {/* Read-only preview */}
-                  <div className={styles.preview}>
-                    {item.content.length > 0 && item.content[0].type === 'text'
-                      ? item.content[0].value
-                      : (item.content.length > 0 ? "Código..." : "Nota vazia...")}
-                  </div>
-                </div>
-              </div>
+        {notes.map((item) => (
+          <div
+            key={item.id}
+            className={styles.card}
+            onClick={() => setActiveNote(item)}
+          >
+            <div className={styles.cardHeader}>
+              <h3 className={styles.cardTitle}>
+                {item.title || "Sem título"}
+              </h3>
+              <button
+                className={styles.deleteBtn}
+                onClick={(e) => handleDeleteClick(e, item)}
+                title="Deletar nota"
+              >
+                Excluir
+              </button>
             </div>
-          ))}
+            <div className={styles.cardContent}>
+              <p className={styles.preview}>
+                {item.content.length > 0
+                  ? item.content.slice(0, 150)
+                  : "Nota vazia..."}
+              </p>
+              <span className={styles.dateLabel}>
+                {formatDate(item.updatedAt)}
+              </span>
+            </div>
+          </div>
+        ))}
 
         {notes.length === 0 && (
           <div className={styles.emptyState}>
@@ -95,7 +105,7 @@ export default function NoteManager() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onConfirm={handleConfirmDelete}
-        title={` Deletar nota "${noteIdToDelete?.title}" `}
+        title={`Deletar nota "${noteToDelete?.title}"`}
         message="Tem certeza que deseja excluir esta nota? Esta ação não pode ser desfeita."
       />
     </div>

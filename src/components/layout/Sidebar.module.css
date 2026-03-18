@@ -145,3 +145,10 @@
   color: var(--text-muted);
   padding: 8px;
 }
+
+.footer {
+  margin-top: auto;
+  padding: 0 12px 12px;
+  border-top: 1px solid var(--border-color);
+  padding-top: 8px;
+}

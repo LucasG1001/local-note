@@ -1,34 +1,13 @@
-interface BackendNote {
+export interface Note {
   id: string;
   title: string;
   content: string;
-  rank: number;
+  ai_description?: string;
   createdAt: string;
   updatedAt: string;
-  tags: string[];
 }
 
-interface Note {
-  id: string;
+export interface NewNote {
   title: string;
-  content: Block[];
-  rank: number;
-  createdAt: string;
-  updatedAt: string;
-  tags: string[];
+  content: string;
 }
-
-interface Block {
-  id: string;
-  type: 'text' | 'code';
-  language?: string;
-  value: string;
-}
-
-interface NewNote {
-  title: string;
-  content: Block[] | [];
-  tags: string[];
-}
-
-export type { Note, NewNote, Block, BackendNote };

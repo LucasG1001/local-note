@@ -1,41 +1,28 @@
-/* Editor.module.css */
+/* Editor.module.css — plain textarea, dark theme */
 .container {
     width: 100%;
-    margin: 20px 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
 }
 
-/* Usando :global(.classe) individualmente ou em bloco de forma compatível */
-.container :global(.ql-toolbar.ql-snow) {
-    border: 1px solid #e2e8f0;
-    border-top-left-radius: 12px;
-    border-top-right-radius: 12px;
-    background-color: #f8fafc;
-    padding: 10px;
-}
-
-.container :global(.ql-container.ql-snow) {
-    border: 1px solid #e2e8f0;
-    border-bottom-left-radius: 12px;
-    border-bottom-right-radius: 12px;
-    font-family: 'Inter', sans-serif;
-    font-size: 17px;
-}
-
-.container :global(.ql-container.ql-snow.ql-code-block-container) {
+.textarea {
+    flex: 1;
+    width: 100%;
     min-height: 400px;
-    font-weight: 500;
-    line-height: 1.6;
-    color: #334155;
+    background-color: transparent;
+    border: none;
+    outline: none;
+    resize: none;
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    font-size: 16px;
+    line-height: 1.75;
+    color: #d4d4d4;
+    caret-color: #818cf8;
+    padding: 0;
 }
 
-.container :global(.ql-code-block-container) {
-    font-family: 'Fira Code', 'Courier New', monospace !important;
-    font-size: 15px !important;
-    color: #abb2bf !important;
-    padding: 20px !important;
-    border-radius: 8px;
-    margin: 15px 0;
-    line-height: 1.5;
-    display: block;
-    white-space: pre;
+.textarea::placeholder {
+    color: #4b5563;
 }

@@ -5,9 +5,10 @@ import React, {
   useState,
   useTransition,
   useRef,
+  useCallback,
 } from "react";
 import { invoke } from "@tauri-apps/api/core";
-import { BackendNote, Block, NewNote, Note } from "../note/types";
+import { Note, NewNote } from "../note/types";
 
 interface NoteContextType {
   notes: Note[];
@@ -15,10 +16,10 @@ interface NoteContextType {
   setActiveNote: (note: Note | null) => void;
   isPending: boolean;
   saveNote: (note: NewNote) => Promise<void>;
+  updateActiveNote: (changes: Partial<Note>) => void;
   deleteNote: (id: string) => Promise<void>;
+  searchNotes: (query: string) => Promise<void>;
   loadNotes: () => Promise<void>;
-  setSelectedTags: (tags: string[]) => void;
-  tags: string[];
 }
 
 const NoteContext = createContext<NoteContextType | undefined>(undefined);
@@ -28,53 +29,41 @@ export function NoteProvider({ children }: { children: React.ReactNode }) {
   const [activeNote, setActiveNote] = useState<Note | null>(null);
   const [isPending, startTransition] = useTransition();
   const isInitialMount = useRef(true);
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [tags, setTags] = useState<string[]>([]);
 
-  const getNotesByTags = async (tags: string[]) => {
-    try {
-      const data = await invoke<BackendNote[]>("get_notes_by_tags", {
-        searchTags: tags,
-      });
-      const processedNotes: Note[] = data.map((note) => ({
-        ...note,
-        content: JSON.parse(note.content) as Block[],
-      }));
-      setNotes(processedNotes);
-    } catch (error) {
-      console.error("Erro ao carregar notas por tags:", error);
-    }
-  };
+  // -----------------------------------------------------------------------
+  // Load / Search
+  // -----------------------------------------------------------------------
 
-  const getNotes = async () => {
+  const loadNotes = useCallback(async () => {
     try {
-      const data = await invoke<BackendNote[]>("get_notes", { limit: 100 });
-      const processedNotes: Note[] = data.map((note) => ({
-        ...note,
-        content: JSON.parse(note.content) as Block[],
-      }));
-      setNotes(processedNotes);
-      setTags([...new Set(data.map((note) => note.tags).flat())]);
+      const data = await invoke<Note[]>("get_notes", { limit: 50 });
+      console.log(data);
+
+      setNotes(data);
     } catch (error) {
       console.error("Erro ao carregar notas:", error);
     }
-  };
+  }, []);
 
-  const loadNotes = async () => {
+  const searchNotes = useCallback(async (query: string) => {
     try {
-      if (selectedTags.length > 0) return getNotesByTags(selectedTags);
-      await getNotes();
+      const data = await invoke<Note[]>("search_notes", { query });
+      setNotes(data);
     } catch (error) {
-      console.error("Erro ao carregar notas:", error);
+      console.error("Erro na busca vetorial:", error);
     }
-  };
+  }, []);
 
   useEffect(() => {
     loadNotes();
-  }, [selectedTags]);
+  }, [loadNotes]);
+
+  // -----------------------------------------------------------------------
+  // Auto-save on activeNote changes (debounced 600ms)
+  // -----------------------------------------------------------------------
 
   useEffect(() => {
-    if (!activeNote || !activeNote.id) return;
+    if (!activeNote?.id) return;
 
     if (isInitialMount.current) {
       isInitialMount.current = false;
@@ -84,39 +73,38 @@ export function NoteProvider({ children }: { children: React.ReactNode }) {
     const timer = setTimeout(() => {
       startTransition(async () => {
         try {
-          const contentString =
-            typeof activeNote.content === "string"
-              ? activeNote.content
-              : JSON.stringify(activeNote.content);
-
           await invoke("update_note", {
             id: activeNote.id,
             title: activeNote.title,
-            content: contentString,
-            tags: activeNote.tags || [],
-            rank: activeNote.rank || 0,
+            content: activeNote.content,
           });
-
-          await loadNotes();
+          // Don't reload the full list on every keystroke — too expensive
+          // because update_note calls Gemini. We only reload after save settles.
         } catch (error) {
           console.error("Erro no auto-save:", error);
         }
       });
-    }, 500);
+    }, 800);
 
     return () => clearTimeout(timer);
   }, [activeNote]);
 
+  // -----------------------------------------------------------------------
+  // CRUD
+  // -----------------------------------------------------------------------
+
+  const updateActiveNote = useCallback((changes: Partial<Note>) => {
+    setActiveNote((prev) => (prev ? { ...prev, ...changes } : prev));
+  }, []);
+
   const saveNote = async ({ title, content }: NewNote) => {
     startTransition(async () => {
       try {
-        await invoke("create_note", {
-          title,
-          content: JSON.stringify(content),
-        });
+        await invoke<string>("create_note", { title, content });
         await loadNotes();
       } catch (error) {
-        alert("Erro ao salvar no banco local");
+        console.error("Erro ao criar nota:", error);
+        alert("Não foi possível salvar a nota.");
       }
     });
   };
@@ -128,7 +116,7 @@ export function NoteProvider({ children }: { children: React.ReactNode }) {
         setNotes((prev) => prev.filter((n) => n.id !== id));
         if (activeNote?.id === id) setActiveNote(null);
       } catch (error) {
-        console.error(error);
+        console.error("Erro ao deletar nota:", error);
       }
     });
   };
@@ -140,11 +128,11 @@ export function NoteProvider({ children }: { children: React.ReactNode }) {
         setActiveNote,
         isPending,
         saveNote,
+        updateActiveNote,
         deleteNote,
         notes,
         loadNotes,
-        setSelectedTags,
-        tags,
+        searchNotes,
       }}
     >
       {children}
